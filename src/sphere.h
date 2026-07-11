@@ -8,9 +8,13 @@
 #include "mesh.h"
 
 typedef struct {
+  vec3 position;
+  vec3 velocity;
+  float weight;
   float radius;
   int sectors;
   int stacks;
+  unsigned texture;
 
   struct {
     Vertice buf[MAX_VERTICES_COUNT];
@@ -23,9 +27,8 @@ typedef struct {
   } indices;
 } Sphere;
 
-void initialize_sphere(Sphere *sphere, float radius, int sectors, int stacks);
-void render_sphere(const Sphere *sphere, const Mesh *mesh);
-void sphere_debug(const Sphere *sphere);
+void initialize_sphere(Sphere *sphere, vec3 position, vec3 velocity, float weight, float radius, int sectors, int stacks, const char *texture_path);
+void render_sphere(Sphere *sphere, const Mesh *mesh, unsigned shader_program);
 size_t get_sphere_vertices_size(const Sphere *sphere);
 size_t get_sphere_indices_size(const Sphere *sphere);
 

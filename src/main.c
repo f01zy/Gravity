@@ -1,3 +1,5 @@
+#define GLEW_STATIC
+
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 #include <cglm/cglm.h>
@@ -70,13 +72,11 @@ int main() {
   }
 
   unsigned shader_program = create_shader_program("../src/shaders/vertex.glsl", "../src/shaders/fragment.glsl");
-  initialize_camera(&camera);
-
+  vec3 temp = {0.0f, 0.0f, 0.0f};
   Sphere sphere;
-  initialize_sphere(&sphere, 3.0f, 72, 24);
-  sphere_debug(&sphere);
-
   Mesh mesh;
+  initialize_camera(&camera);
+  initialize_sphere(&sphere, temp, temp, 1.0f, 2.0f, 72, 24, "../resources/textures/earth.jpg");
   initialize_mesh(&mesh, sphere.vertices.buf, get_sphere_vertices_size(&sphere), sphere.indices.buf, get_sphere_indices_size(&sphere));
 
   while (!glfwWindowShouldClose(window)) {
@@ -85,21 +85,19 @@ int main() {
     deltatime = now - last_frame;
     if (deltatime < need) continue;
     last_frame = now;
-    glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
+    glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     handle_keyboard(window, deltatime);
 
     glUseProgram(shader_program);
     mat4 view;
     mat4 projection;
-    mat4 model = GLM_MAT4_IDENTITY_INIT;
     update_position(&camera);
     get_view_matrix(&camera, view);
     glm_perspective(camera.fov, (float)WIDTH / (float)HEIGHT, 0.1f, 100.0f, projection);
-    set_mat4(shader_program, "model", model);
     set_mat4(shader_program, "view", view);
     set_mat4(shader_program, "projection", projection);
-    render_sphere(&sphere, &mesh);
+    render_sphere(&sphere, &mesh, shader_program);
 
     glfwPollEvents();
     glfwSwapBuffers(window);
