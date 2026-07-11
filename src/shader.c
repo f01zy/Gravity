@@ -16,10 +16,10 @@ void inialize_shader(unsigned shader_program, unsigned shader, const char *path)
   glGetShaderiv(shader, GL_COMPILE_STATUS, &success);
   if (!success) {
     glGetShaderInfoLog(shader, sizeof(info), NULL, info);
-    printf("ERROR: Failed to compile shader: %s\n", info);
+    printf("[ERROR] Failed to compile shader: %s\n", info);
     return;
   }
-  printf("LOG: Shader successfully compiled: %s\n", path);
+  printf("[LOG] Shader successfully compiled: %s\n", path);
   glAttachShader(shader_program, shader);
 }
 

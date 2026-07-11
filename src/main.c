@@ -5,8 +5,9 @@
 
 #include "camera.h"
 #include "defines.h"
+#include "mesh.h"
 #include "shader.h"
-#include "vertices.h"
+#include "sphere.h"
 
 Camera camera;
 float last_mouse_x;
@@ -43,7 +44,7 @@ void mouse_position_callback(GLFWwindow *window, double xpos, double ypos) {
 
 int main() {
   if (!glfwInit()) {
-    printf("ERROR: Failed to initialize GLFW\n");
+    printf("[ERROR] Failed to initialize GLFW\n");
     return 1;
   }
   glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
@@ -52,7 +53,7 @@ int main() {
   glfwWindowHint(GLFW_RESIZABLE, GL_FALSE);
   GLFWwindow *window = glfwCreateWindow(WIDTH, HEIGHT, TITLE, NULL, NULL);
   if (!window) {
-    printf("ERROR: Failed to create window\n");
+    printf("[ERROR] Failed to create window\n");
     glfwTerminate();
     return 1;
   }
@@ -63,28 +64,20 @@ int main() {
   glewExperimental = GL_TRUE;
   GLenum err = glewInit();
   if (err != GLEW_OK) {
-    printf("ERROR: Failed to initialize GLEW: %s\n", glewGetErrorString(err));
+    printf("[ERROR] Failed to initialize GLEW: %s\n", glewGetErrorString(err));
     glfwTerminate();
     return 1;
   }
 
-  unsigned VAO, VBO, IBO;
-  glGenVertexArrays(1, &VAO);
-  glGenBuffers(1, &VBO);
-  glGenBuffers(1, &IBO);
-  glBindVertexArray(VAO);
-  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, IBO);
-  glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
-  glBindBuffer(GL_ARRAY_BUFFER, VBO);
-  glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 5, (void *)0);
-  glEnableVertexAttribArray(0);
-  glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 5, (void *)(sizeof(float) * 3));
-  glEnableVertexAttribArray(1);
-  glBindVertexArray(0);
-
-  unsigned shader_program = create_shader_program("/home/f01zy/Programming/Gravity/src/vertex.glsl", "/home/f01zy/Programming/Gravity/src/fragment.glsl");
+  unsigned shader_program = create_shader_program("../src/shaders/vertex.glsl", "../src/shaders/fragment.glsl");
   initialize_camera(&camera);
+
+  Sphere sphere;
+  initialize_sphere(&sphere, 3.0f, 72, 24);
+  sphere_debug(&sphere);
+
+  Mesh mesh;
+  initialize_mesh(&mesh, sphere.vertices.buf, get_sphere_vertices_size(&sphere), sphere.indices.buf, get_sphere_indices_size(&sphere));
 
   while (!glfwWindowShouldClose(window)) {
     float now = glfwGetTime();
@@ -99,27 +92,18 @@ int main() {
     glUseProgram(shader_program);
     mat4 view;
     mat4 projection;
+    mat4 model = GLM_MAT4_IDENTITY_INIT;
     update_position(&camera);
     get_view_matrix(&camera, view);
     glm_perspective(camera.fov, (float)WIDTH / (float)HEIGHT, 0.1f, 100.0f, projection);
+    set_mat4(shader_program, "model", model);
     set_mat4(shader_program, "view", view);
     set_mat4(shader_program, "projection", projection);
-
-    glBindVertexArray(VAO);
-    for (int i = 0; i < sizeof(cubes) / sizeof(cubes[0]); i++) {
-      mat4 model = GLM_MAT4_IDENTITY_INIT;
-      glm_translate(model, cubes[i]);
-      set_mat4(shader_program, "model", model);
-      glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
-    }
-    glBindVertexArray(0);
+    render_sphere(&sphere, &mesh);
 
     glfwPollEvents();
     glfwSwapBuffers(window);
   }
 
-  glDeleteVertexArrays(1, &VAO);
-  glDeleteBuffers(1, &VBO);
-  glDeleteBuffers(1, &IBO);
   glfwTerminate();
 }

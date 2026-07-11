@@ -9,7 +9,7 @@ vec3 target = {0.0f, 0.0f, 0.0f};
 
 void initialize_camera(Camera *camera) {
   camera->fov = 45.0f;
-  camera->yaw = 90.0f;
+  camera->yaw = 0.0f;
   camera->pitch = 0.0f;
   camera->radius = 10.0f;
   update_position(camera);
