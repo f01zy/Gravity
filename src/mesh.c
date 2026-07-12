@@ -1,8 +1,9 @@
-#include <GL/glew.h>
-
 #include "mesh.h"
+#include <glad/gl.h>
 
-void initialize_mesh(Mesh *mesh, Vertice *vertices, size_t vertices_size, ivec3 *indices, size_t indices_size) {
+MeshInitStatus mesh_initialize(Mesh *mesh, Vertice *vertices, size_t vertices_size, ivec3 *indices, size_t indices_size) {
+  if (!mesh || !vertices || !indices) return MESH_INIT_MISSING_DATA;
+
   glGenVertexArrays(1, &mesh->VAO);
   glBindVertexArray(mesh->VAO);
 
@@ -23,4 +24,12 @@ void initialize_mesh(Mesh *mesh, Vertice *vertices, size_t vertices_size, ivec3 
   glBindVertexArray(0);
   glBindBuffer(GL_ARRAY_BUFFER, 0);
   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+
+  return MESH_INIT_SUCCESS;
+}
+
+void mesh_remove(Mesh *mesh) {
+  glDeleteVertexArrays(1, &mesh->VAO);
+  glDeleteBuffers(1, &mesh->VBO);
+  glDeleteBuffers(1, &mesh->IBO);
 }

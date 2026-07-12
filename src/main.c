@@ -1,15 +1,15 @@
-#define GLEW_STATIC
+#include <glad/gl.h>
 
-#include <GL/glew.h>
 #include <GLFW/glfw3.h>
 #include <cglm/cglm.h>
+#include <stdint.h>
 #include <stdio.h>
 
 #include "camera.h"
 #include "defines.h"
-#include "mesh.h"
+#include "renderer.h"
+#include "resource_manager.h"
 #include "shader.h"
-#include "sphere.h"
 
 Camera camera;
 float last_mouse_x;
@@ -62,22 +62,26 @@ int main() {
   glfwMakeContextCurrent(window);
   glfwSetScrollCallback(window, mouse_scroll_callback);
   glfwSetCursorPosCallback(window, mouse_position_callback);
-  glEnable(GL_DEPTH_TEST);
-  glewExperimental = GL_TRUE;
-  GLenum err = glewInit();
-  if (err != GLEW_OK) {
-    printf("[ERROR] Failed to initialize GLEW: %s\n", glewGetErrorString(err));
+
+  int version = gladLoadGL(glfwGetProcAddress);
+  if (version == 0) {
+    printf("[ERROR] Failed to initialize OpenGL context\n");
     glfwTerminate();
     return 1;
   }
+  printf("[LOG] Loaded OpenGL %d.%d\n", GLAD_VERSION_MAJOR(version), GLAD_VERSION_MINOR(version));
 
-  unsigned shader_program = create_shader_program("../src/shaders/vertex.glsl", "../src/shaders/fragment.glsl");
+  glEnable(GL_DEPTH_TEST);
   vec3 temp = {0.0f, 0.0f, 0.0f};
-  Sphere sphere;
-  Mesh mesh;
-  initialize_camera(&camera);
-  initialize_sphere(&sphere, temp, temp, 1.0f, 2.0f, 72, 24, "../resources/textures/earth.jpg");
-  initialize_mesh(&mesh, sphere.vertices.buf, get_sphere_vertices_size(&sphere), sphere.indices.buf, get_sphere_indices_size(&sphere));
+  ResourceManager resource_manager = {0};
+  uint32_t shader_pipeline_id = res_create_shader_pipeline(&resource_manager, "../src/shaders/vertex.glsl", "../src/shaders/fragment.glsl");
+  uint32_t sphere_id = res_create_sphere(&resource_manager, temp, temp, 1.0f, 3.0f, 72, 24, "../resources/textures/earth.jpg");
+  if (shader_pipeline_id == INVALID_RESOURCE || sphere_id == INVALID_RESOURCE) {
+    printf("[ERROR] Failed to create resources\n");
+    glfwTerminate();
+    return 1;
+  }
+  ShaderPipeline *shader_pipeline = res_get_shader_pipeline(&resource_manager, shader_pipeline_id);
 
   while (!glfwWindowShouldClose(window)) {
     float now = glfwGetTime();
@@ -89,15 +93,15 @@ int main() {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     handle_keyboard(window, deltatime);
 
-    glUseProgram(shader_program);
+    glUseProgram(shader_pipeline->shader_program);
     mat4 view;
     mat4 projection;
     update_position(&camera);
     get_view_matrix(&camera, view);
     glm_perspective(camera.fov, (float)WIDTH / (float)HEIGHT, 0.1f, 100.0f, projection);
-    set_mat4(shader_program, "view", view);
-    set_mat4(shader_program, "projection", projection);
-    render_sphere(&sphere, &mesh, shader_program);
+    uniform_set_mat4(shader_pipeline->shader_program, "view", view);
+    uniform_set_mat4(shader_pipeline->shader_program, "projection", projection);
+    render_sphere(&resource_manager, sphere_id, shader_pipeline_id);
 
     glfwPollEvents();
     glfwSwapBuffers(window);

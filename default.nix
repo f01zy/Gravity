@@ -10,7 +10,6 @@ let
     libffi
     libglvnd
     libGL
-    glew
   ];
 in
 pkgs.mkShell {

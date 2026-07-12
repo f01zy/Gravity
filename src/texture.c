@@ -1,20 +1,21 @@
 #define STB_IMAGE_IMPLEMENTATION
 
-#include <GL/glew.h>
+#include <glad/gl.h>
 #include <stb_image.h>
-#include <stdio.h>
+#include <stdint.h>
 
 #include "texture.h"
 
-unsigned create_texture(const char *path) {
+TextureInitStatus texture_initialize(uint32_t *texture, const char *path) {
+  if (!texture || !path) return TEXTURE_INIT_MISSING_DATA;
+
   int width, height, channels;
-  unsigned char *data = stbi_load(path, &width, &height, &channels, 0);
-  unsigned format;
+  uint8_t *data = stbi_load(path, &width, &height, &channels, 0);
+  uint32_t format;
 
   if (!data) {
-    printf("[ERROR] Failed to load texture: %s\n", path);
     stbi_image_free(data);
-    return 0;
+    return TEXTURE_INIT_FAILED_LOAD;
   }
 
   switch (channels) {
@@ -29,9 +30,8 @@ unsigned create_texture(const char *path) {
     break;
   }
 
-  unsigned texture;
-  glGenTextures(1, &texture);
-  glBindTexture(GL_TEXTURE_2D, texture);
+  glGenTextures(1, texture);
+  glBindTexture(GL_TEXTURE_2D, *texture);
   glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, format, GL_UNSIGNED_BYTE, data);
   glGenerateMipmap(GL_TEXTURE_2D);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
@@ -40,7 +40,8 @@ unsigned create_texture(const char *path) {
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
   glBindTexture(GL_TEXTURE_2D, 0);
   stbi_image_free(data);
-  printf("[LOG] Texture successfully created: %s\n", path);
 
-  return texture;
+  return TEXTURE_INIT_SUCCESS;
 }
+
+void texture_remove(uint32_t texture) { glDeleteTextures(1, &texture); }

@@ -12,9 +12,9 @@ set(TARGET gravity)
 file(GLOB SOURCE ./src/*.c)
 add_executable(${TARGET} ${SOURCE})
 find_package(OpenGL REQUIRED)
-find_package(GLEW REQUIRED)
 add_subdirectory(./third_party/glfw)
 add_subdirectory(./third_party/cglm)
+add_subdirectory(./third_party/glad)
 
 target_include_directories(${TARGET} PRIVATE 
   ${CMAKE_CURRENT_SOURCE_DIR}/src
@@ -23,7 +23,7 @@ target_include_directories(${TARGET} PRIVATE
 
 target_link_libraries(${TARGET} PRIVATE 
   OpenGL::GL
-  GLEW::GLEW
+  glad
   cglm
   glfw
 )

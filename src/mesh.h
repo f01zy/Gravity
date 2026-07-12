@@ -16,6 +16,12 @@ typedef struct {
   unsigned IBO;
 } Mesh;
 
-void initialize_mesh(Mesh *mesh, Vertice *vertices, size_t vertices_size, ivec3 *indices, size_t indices_size);
+typedef enum {
+  MESH_INIT_MISSING_DATA,
+  MESH_INIT_SUCCESS,
+} MeshInitStatus;
+
+MeshInitStatus mesh_initialize(Mesh *mesh, Vertice *vertices, size_t vertices_size, ivec3 *indices, size_t indices_size);
+void mesh_remove(Mesh *mesh);
 
 #endif
