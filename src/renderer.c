@@ -35,7 +35,7 @@ void render_scene(const ResourceManager *resource_manager, Camera *camera, uint3
   mat4 projection;
   camera_update_position(camera);
   camera_get_view_matrix(camera, view);
-  glm_perspective(camera->fov, (float)WIDTH / (float)HEIGHT, 0.1f, 100.0f, projection);
+  glm_perspective(camera->fov, (float)WIDTH / (float)HEIGHT, 0.1f, 1000.0f, projection);
   uniform_set_mat4(shader_pipeline->shader_program, "view", view);
   uniform_set_mat4(shader_pipeline->shader_program, "projection", projection);
 
