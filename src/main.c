@@ -9,7 +9,6 @@
 #include "defines.h"
 #include "renderer.h"
 #include "resource_manager.h"
-#include "shader.h"
 
 Camera camera;
 float last_mouse_x;
@@ -72,6 +71,7 @@ int main() {
   printf("[LOG] Loaded OpenGL %d.%d\n", GLAD_VERSION_MAJOR(version), GLAD_VERSION_MINOR(version));
 
   glEnable(GL_DEPTH_TEST);
+  camera_initialize(&camera);
   vec3 temp = {0.0f, 0.0f, 0.0f};
   ResourceManager resource_manager = {0};
   uint32_t shader_pipeline_id = res_create_shader_pipeline(&resource_manager, "../src/shaders/vertex.glsl", "../src/shaders/fragment.glsl");
@@ -81,7 +81,6 @@ int main() {
     glfwTerminate();
     return 1;
   }
-  ShaderPipeline *shader_pipeline = res_get_shader_pipeline(&resource_manager, shader_pipeline_id);
 
   while (!glfwWindowShouldClose(window)) {
     float now = glfwGetTime();
@@ -92,20 +91,11 @@ int main() {
     glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     handle_keyboard(window, deltatime);
-
-    glUseProgram(shader_pipeline->shader_program);
-    mat4 view;
-    mat4 projection;
-    update_position(&camera);
-    get_view_matrix(&camera, view);
-    glm_perspective(camera.fov, (float)WIDTH / (float)HEIGHT, 0.1f, 100.0f, projection);
-    uniform_set_mat4(shader_pipeline->shader_program, "view", view);
-    uniform_set_mat4(shader_pipeline->shader_program, "projection", projection);
-    render_sphere(&resource_manager, sphere_id, shader_pipeline_id);
-
+    render_scene(&resource_manager, &camera, shader_pipeline_id);
     glfwPollEvents();
     glfwSwapBuffers(window);
   }
 
+  res_remove_all(&resource_manager);
   glfwTerminate();
 }

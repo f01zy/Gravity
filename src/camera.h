@@ -14,8 +14,8 @@ typedef struct {
   float fov;
 } Camera;
 
-void initialize_camera(Camera *camera);
-void update_position(Camera *camera);
-void get_view_matrix(Camera *camera, mat4 view);
+void camera_initialize(Camera *camera);
+void camera_update_position(Camera *camera);
+void camera_get_view_matrix(Camera *camera, mat4 view);
 
 #endif

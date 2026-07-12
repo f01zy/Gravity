@@ -7,15 +7,15 @@
 vec3 world_up = {0.0f, 1.0f, 0.0f};
 vec3 target = {0.0f, 0.0f, 0.0f};
 
-void initialize_camera(Camera *camera) {
+void camera_initialize(Camera *camera) {
   camera->fov = 45.0f;
   camera->yaw = 0.0f;
   camera->pitch = 0.0f;
   camera->radius = 10.0f;
-  update_position(camera);
+  camera_update_position(camera);
 }
 
-void update_position(Camera *camera) {
+void camera_update_position(Camera *camera) {
   vec3 temp, direction;
   temp[0] = camera->radius * cos(glm_rad(camera->yaw)) * cos(glm_rad(camera->pitch));
   temp[1] = camera->radius * sin(glm_rad(camera->pitch));
@@ -29,4 +29,4 @@ void update_position(Camera *camera) {
   glm_normalize(camera->up);
 }
 
-void get_view_matrix(Camera *camera, mat4 view) { return glm_lookat(camera->position, target, camera->up, view); }
+void camera_get_view_matrix(Camera *camera, mat4 view) { return glm_lookat(camera->position, target, camera->up, view); }

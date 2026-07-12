@@ -28,7 +28,7 @@ MeshInitStatus mesh_initialize(Mesh *mesh, Vertice *vertices, size_t vertices_si
   return MESH_INIT_SUCCESS;
 }
 
-void mesh_remove(Mesh *mesh) {
+void mesh_remove(const Mesh *mesh) {
   glDeleteVertexArrays(1, &mesh->VAO);
   glDeleteBuffers(1, &mesh->VBO);
   glDeleteBuffers(1, &mesh->IBO);

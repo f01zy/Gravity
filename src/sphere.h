@@ -5,17 +5,18 @@
 #include <stddef.h>
 #include <stdint.h>
 
-#include "defines.h"
 #include "mesh.h"
 
 typedef struct {
-  Vertice buf[MAX_VERTICES_COUNT];
+  Vertice *buf;
   size_t len;
+  size_t size;
 } Vertices;
 
 typedef struct {
-  ivec3 buf[MAX_INDICES_COUNT];
+  ivec3 *buf;
   size_t len;
+  size_t size;
 } Indices;
 
 typedef struct {
@@ -37,6 +38,7 @@ typedef enum {
 } SphereInitStatus;
 
 SphereInitStatus sphere_initialize(Sphere *sphere, vec3 position, vec3 velocity, float weight, float radius, int sectors, int stacks);
+void sphere_remove(Sphere *sphere);
 size_t get_sphere_vertices_size(const Sphere *sphere);
 size_t get_sphere_indices_size(const Sphere *sphere);
 

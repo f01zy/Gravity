@@ -4,28 +4,27 @@
 #include <stddef.h>
 #include <stdint.h>
 
-#include "defines.h"
 #include "mesh.h"
 #include "shader.h"
 #include "sphere.h"
 
 typedef struct {
-  ShaderPipeline buf[MAX_RESOURCES_COUNT];
+  ShaderPipeline *buf;
   size_t len;
 } ShaderPipelineResources;
 
 typedef struct {
-  Mesh buf[MAX_RESOURCES_COUNT];
+  Mesh *buf;
   size_t len;
 } MeshResources;
 
 typedef struct {
-  Sphere buf[MAX_RESOURCES_COUNT];
+  Sphere *buf;
   size_t len;
 } SphereResources;
 
 typedef struct {
-  unsigned buf[MAX_RESOURCES_COUNT];
+  uint32_t *buf;
   size_t len;
 } CommonResources;
 
@@ -42,9 +41,11 @@ uint32_t res_create_shader_pipeline(ResourceManager *resource_manager, const cha
 uint32_t res_create_sphere(ResourceManager *resource_manager, vec3 position, vec3 velocity, float weight, float radius, int sectors, int stacks,
                            const char *texture_path);
 
-Mesh *res_get_mesh(ResourceManager *resource_manager, uint32_t mesh_id);
-uint32_t res_get_texture(ResourceManager *resource_manager, uint32_t texture_id);
-ShaderPipeline *res_get_shader_pipeline(ResourceManager *resource_manager, uint32_t shader_pipeline_id);
-Sphere *res_get_sphere(ResourceManager *resource_manager, uint32_t sphere_id);
+Mesh *res_get_mesh(const ResourceManager *resource_manager, uint32_t mesh_id);
+uint32_t res_get_texture(const ResourceManager *resource_manager, uint32_t texture_id);
+ShaderPipeline *res_get_shader_pipeline(const ResourceManager *resource_manager, uint32_t shader_pipeline_id);
+Sphere *res_get_sphere(const ResourceManager *resource_manager, uint32_t sphere_id);
+
+void res_remove_all(ResourceManager *resource_manager);
 
 #endif

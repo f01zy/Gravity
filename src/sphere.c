@@ -2,31 +2,25 @@
 #include <glad/gl.h>
 #include <math.h>
 #include <stdio.h>
+#include <string.h>
 
 #include "defines.h"
 #include "sphere.h"
 
-// TODO: выделить буферы под вершины и индексы динамически
-
 SphereInitStatus sphere_initialize(Sphere *sphere, vec3 position, vec3 velocity, float weight, float radius, int sectors, int stacks) {
   if (!sphere) return SPHERE_INIT_MISSING_DATA;
 
+  memset(sphere, 0, sizeof(Sphere));
   glm_vec3_copy(position, sphere->position);
   glm_vec3_copy(velocity, sphere->velocity);
   sphere->weight = weight;
   sphere->radius = radius;
   sphere->sectors = sectors;
   sphere->stacks = stacks;
-  sphere->vertices.len = 0;
-  sphere->indices.len = 0;
-  sphere->texture = 0;
-  sphere->mesh = 0;
 
   float length_inv = 1.0f / radius;
   float sector_step = PI * 2.0f / (float)sectors;
   float stack_step = PI / (float)stacks;
-  size_t vertices_size = sizeof(sphere->vertices.buf) / sizeof(sphere->vertices.buf[0]);
-  size_t indices_size = sizeof(sphere->indices.buf) / sizeof(sphere->indices.buf[0]);
 
   for (int i = 0; i <= stacks; i++) {
     float stack_angle = PI / 2.0f - stack_step * (float)i;
@@ -34,7 +28,10 @@ SphereInitStatus sphere_initialize(Sphere *sphere, vec3 position, vec3 velocity,
     float y = radius * sinf(stack_angle);
 
     for (int j = 0; j <= sectors; j++) {
-      if (sphere->vertices.len > vertices_size) break;
+      if (sphere->vertices.len >= sphere->vertices.size) {
+        sphere->vertices.size = (sphere->vertices.size + 1) * 2;
+        sphere->vertices.buf = (Vertice *)realloc(sphere->vertices.buf, sizeof(Vertice) * sphere->vertices.size);
+      }
       float sector_angle = sector_step * (float)j;
       float x = xz * sinf(sector_angle);
       float z = xz * cosf(sector_angle);
@@ -62,7 +59,10 @@ SphereInitStatus sphere_initialize(Sphere *sphere, vec3 position, vec3 velocity,
     int k1 = i * (sectors + 1);
     int k2 = k1 + sectors + 1;
     for (int j = 0; j < sectors; j++, k1++, k2++) {
-      if (sphere->indices.len > indices_size) break;
+      if (sphere->indices.len >= sphere->indices.size) {
+        sphere->indices.size = (sphere->indices.size + 1) * 2;
+        sphere->indices.buf = (ivec3 *)realloc(sphere->indices.buf, sizeof(ivec3) * sphere->indices.size);
+      }
       if (i) {
         size_t len = sphere->indices.len;
         sphere->indices.buf[len][0] = k1;
@@ -83,6 +83,18 @@ SphereInitStatus sphere_initialize(Sphere *sphere, vec3 position, vec3 velocity,
   return SPHERE_INIT_SUCCESS;
 }
 
-size_t get_sphere_vertices_size(const Sphere *sphere) { return sizeof(sphere->vertices.buf[0]) * sphere->vertices.len; }
+void sphere_remove(Sphere *sphere) {
+  if (!sphere) return;
+  free(sphere->vertices.buf);
+  free(sphere->indices.buf);
+}
 
-size_t get_sphere_indices_size(const Sphere *sphere) { return sizeof(sphere->indices.buf[0]) * sphere->indices.len; }
+size_t get_sphere_vertices_size(const Sphere *sphere) {
+  if (!sphere) return 0;
+  return sizeof(sphere->vertices.buf[0]) * sphere->vertices.len;
+}
+
+size_t get_sphere_indices_size(const Sphere *sphere) {
+  if (!sphere) return 0;
+  return sizeof(sphere->indices.buf[0]) * sphere->indices.len;
+}

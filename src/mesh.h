@@ -22,6 +22,6 @@ typedef enum {
 } MeshInitStatus;
 
 MeshInitStatus mesh_initialize(Mesh *mesh, Vertice *vertices, size_t vertices_size, ivec3 *indices, size_t indices_size);
-void mesh_remove(Mesh *mesh);
+void mesh_remove(const Mesh *mesh);
 
 #endif
