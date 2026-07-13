@@ -15,6 +15,7 @@ set(SOURCE
   ./src/physics/physics.c
   ./src/renderer/camera.c
   ./src/renderer/renderer.c
+  ./src/renderer/text.c
   ./src/renderer/hud.c
   ./src/resources/font.c
   ./src/resources/mesh.c

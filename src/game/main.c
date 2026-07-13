@@ -9,7 +9,9 @@
 #include "core/time.h"
 #include "physics/physics.h"
 #include "renderer/camera.h"
+#include "renderer/hud.h"
 #include "renderer/renderer.h"
+#include "renderer/text.h"
 #include "resources/resource_manager.h"
 
 Camera camera;
@@ -68,7 +70,6 @@ int main() {
     return 1;
   }
   printf("[LOG] Loaded OpenGL %d.%d\n", GLAD_VERSION_MAJOR(version), GLAD_VERSION_MINOR(version));
-
   glEnable(GL_DEPTH_TEST);
   glEnable(GL_BLEND);
   glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -76,14 +77,14 @@ int main() {
   ResourceManager resource_manager = {0};
   Time time = {0};
   time.fps = FPS;
-
   uint32_t base_shader_pipeline_id = res_create_shader_pipeline(&resource_manager, "../src/shaders/base.vert", "../src/shaders/base.frag");
   uint32_t text_shader_pipeline_id = res_create_shader_pipeline(&resource_manager, "../src/shaders/text.vert", "../src/shaders/text.frag");
   uint32_t font_id = res_create_font(&resource_manager, "../resources/fonts/Tamzen8x16b.ttf", 16);
-  uint32_t text_mesh = res_create_text_mesh(&resource_manager);
+  uint32_t text_mesh_id = res_create_text_mesh(&resource_manager);
 
-  if (base_shader_pipeline_id == INVALID_RESOURCE || text_shader_pipeline_id == INVALID_RESOURCE || font_id == INVALID_RESOURCE) {
-    printf("[ERROR] Failed to create resources\n");
+  if (base_shader_pipeline_id == INVALID_RESOURCE || text_shader_pipeline_id == INVALID_RESOURCE || font_id == INVALID_RESOURCE
+      || text_mesh_id == INVALID_RESOURCE) {
+    printf("[ERROR] Failed to create the resources\n");
     glfwTerminate();
     return 1;
   }
@@ -117,7 +118,8 @@ int main() {
     handle_keyboard(window, time.deltatime);
     physics_apply_gravity(resource_manager.spheres.buf, resource_manager.spheres.len, time.deltatime);
     physics_move_spheres(resource_manager.spheres.buf, resource_manager.spheres.len, time.deltatime);
-    render_scene(&resource_manager, &camera, base_shader_pipeline_id);
+    renderer_render_scene(&resource_manager, &camera, base_shader_pipeline_id);
+    hud_render(&resource_manager, (TextResources){.font_id = font_id, .mesh_id = text_mesh_id, .shader_pipeline_id = text_shader_pipeline_id}, time.deltatime);
 
     glfwPollEvents();
     glfwSwapBuffers(window);

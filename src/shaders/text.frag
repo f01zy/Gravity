@@ -7,6 +7,7 @@ uniform sampler2D text_texture;
 uniform vec3 text_color;
 
 void main() {
-  vec4 sampled = vec4(1.0f, 1.0f, 1.0f, texture(text_texture, vertex_texture_coordinates).r);
+  vec2 inverted_coordinates = vec2(vertex_texture_coordinates.x, 1.0f - vertex_texture_coordinates.y);
+  vec4 sampled = vec4(1.0f, 1.0f, 1.0f, texture(text_texture, inverted_coordinates).r);
   color = vec4(text_color, 1.0f) * sampled;
 }

@@ -88,17 +88,10 @@ SphereInitStatus sphere_initialize(Sphere *sphere, SphereProperties properties) 
 }
 
 void sphere_remove(Sphere *sphere) {
-  if (!sphere) return;
   free(sphere->vertices.buf);
   free(sphere->indices.buf);
 }
 
-size_t get_sphere_vertices_size(const Sphere *sphere) {
-  if (!sphere) return 0;
-  return sizeof(sphere->vertices.buf[0]) * sphere->vertices.len;
-}
+size_t get_sphere_vertices_size(const Sphere *sphere) { return sizeof(sphere->vertices.buf[0]) * sphere->vertices.len; }
 
-size_t get_sphere_indices_size(const Sphere *sphere) {
-  if (!sphere) return 0;
-  return sizeof(sphere->indices.buf[0]) * sphere->indices.len;
-}
+size_t get_sphere_indices_size(const Sphere *sphere) { return sizeof(sphere->indices.buf[0]) * sphere->indices.len; }

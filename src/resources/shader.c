@@ -46,4 +46,6 @@ void uniform_set_mat4(uint32_t shader_program, const char *name, mat4 mat) {
   glUniformMatrix4fv(glGetUniformLocation(shader_program, name), 1, GL_FALSE, (float *)mat);
 }
 
+void uniform_set_vec3(uint32_t shader_program, const char *name, vec3 vec) { glUniform3fv(glGetUniformLocation(shader_program, name), 1, vec); }
+
 void uniform_set_int(uint32_t shader_program, const char *name, int x) { glUniform1i(glGetUniformLocation(shader_program, name), x); }

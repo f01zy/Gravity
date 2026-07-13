@@ -6,19 +6,14 @@
 #include <stdint.h>
 
 typedef struct {
+  uint32_t texture;
   uint32_t advance;
   ivec2 size;
   ivec2 bearing;
 } Character;
 
 typedef struct {
-  Character buf[255];
-  size_t len;
-} Characters;
-
-typedef struct {
-  uint32_t texture_id;
-  Characters characters;
+  Character characters[255];
 } Font;
 
 typedef enum {
@@ -29,5 +24,6 @@ typedef enum {
 } FontInitStatus;
 
 FontInitStatus font_initialize(Font *font, const char *path, int size);
+void font_remove(Font *font);
 
 #endif

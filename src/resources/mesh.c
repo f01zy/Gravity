@@ -13,7 +13,7 @@ MeshInitStatus mesh_initialize(Mesh *mesh, MeshProperties properties) {
   size_t attributes_size = properties.attributes_size;
   GLenum render_mode = properties.render_mode;
 
-  if (!mesh || !vertices || !attributes) return MESH_INIT_MISSING_DATA;
+  if (!mesh || !attributes) return MESH_INIT_MISSING_DATA;
   if (render_mode != GL_STATIC_DRAW && render_mode != GL_DYNAMIC_DRAW && render_mode != GL_STREAM_DRAW) return MESH_INIT_RENDER_MODE_ERROR;
   for (int i = 0; i < attributes_size; i++) {
     size_t type_size = utility_get_opengl_type_size(attributes[i].type);

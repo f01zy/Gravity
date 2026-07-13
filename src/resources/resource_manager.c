@@ -13,7 +13,6 @@
 #include "resources/texture.h"
 
 uint32_t res_create_text_mesh(ResourceManager *resource_manager) {
-  if (!resource_manager) return INVALID_RESOURCE;
   Attribute attributes[] = {(Attribute){.size = 4, .type = GL_FLOAT}};
   ivec3 indices[] = {{0, 1, 3}, {1, 2, 3}};
   return res_create_mesh(resource_manager, (MeshProperties){
@@ -22,13 +21,12 @@ uint32_t res_create_text_mesh(ResourceManager *resource_manager) {
                                              .indices = indices,
                                              .indices_size = sizeof(indices),
                                              .attributes = attributes,
-                                             .attributes_size = sizeof(attributes),
+                                             .attributes_size = 1,
                                              .render_mode = GL_DYNAMIC_DRAW,
                                            });
 }
 
 uint32_t res_create_mesh(ResourceManager *resource_manager, MeshProperties properties) {
-  if (!resource_manager) return INVALID_RESOURCE;
   resource_manager->meshes.buf = (Mesh *)realloc(resource_manager->meshes.buf, sizeof(Mesh) * (resource_manager->meshes.len + 1));
   Mesh *mesh = &resource_manager->meshes.buf[resource_manager->meshes.len];
   MeshInitStatus status = mesh_initialize(mesh, properties);
@@ -55,7 +53,6 @@ uint32_t res_create_mesh(ResourceManager *resource_manager, MeshProperties prope
 }
 
 uint32_t res_create_texture(ResourceManager *resource_manager, const char *path) {
-  if (!resource_manager) return INVALID_RESOURCE;
   resource_manager->textures.buf = (uint32_t *)realloc(resource_manager->textures.buf, sizeof(uint32_t) * (resource_manager->textures.len + 1));
   uint32_t *texture = &resource_manager->textures.buf[resource_manager->textures.len];
   TextureInitStatus status = texture_initialize(texture, path);
@@ -75,11 +72,11 @@ uint32_t res_create_texture(ResourceManager *resource_manager, const char *path)
     printf("[ERROR] %s\n", err);
     return INVALID_RESOURCE;
   }
+  printf("[LOG] The texture was successfully created: %s\n", path);
   return resource_manager->textures.len++;
 }
 
 uint32_t res_create_shader_pipeline(ResourceManager *resource_manager, const char *vertex_shader_path, const char *fragment_shader_path) {
-  if (!resource_manager) return INVALID_RESOURCE;
   size_t new_size = sizeof(ShaderPipeline) * (resource_manager->shader_pipelines.len + 1);
   resource_manager->shader_pipelines.buf = (ShaderPipeline *)realloc(resource_manager->shader_pipelines.buf, new_size);
   ShaderPipeline *pipeline = &resource_manager->shader_pipelines.buf[resource_manager->shader_pipelines.len];
@@ -103,11 +100,11 @@ uint32_t res_create_shader_pipeline(ResourceManager *resource_manager, const cha
     printf("[ERROR] %s\n", err);
     return INVALID_RESOURCE;
   }
+  printf("[LOG] The shader pipeline was successfully created: %s\n", vertex_shader_path);
   return resource_manager->shader_pipelines.len++;
 }
 
 uint32_t res_create_font(ResourceManager *resource_manager, const char *path, int size) {
-  if (!resource_manager) return INVALID_RESOURCE;
   resource_manager->fonts.buf = (Font *)realloc(resource_manager->fonts.buf, sizeof(Font) * (resource_manager->spheres.len + 1));
   Font *font = &resource_manager->fonts.buf[resource_manager->fonts.len];
   FontInitStatus status = font_initialize(font, path, size);
@@ -130,11 +127,11 @@ uint32_t res_create_font(ResourceManager *resource_manager, const char *path, in
     printf("[ERROR] %s\n", err);
     return INVALID_RESOURCE;
   }
+  printf("[LOG] The font was successfully created: %s\n", path);
   return resource_manager->fonts.len++;
 }
 
 uint32_t res_create_sphere(ResourceManager *resource_manager, const char *texture_path, SphereProperties properties) {
-  if (!resource_manager) return INVALID_RESOURCE;
   resource_manager->spheres.buf = (Sphere *)realloc(resource_manager->spheres.buf, sizeof(Sphere) * (resource_manager->spheres.len + 1));
   Sphere *sphere = &resource_manager->spheres.buf[resource_manager->spheres.len];
   SphereInitStatus status = sphere_initialize(sphere, properties);
@@ -157,7 +154,7 @@ uint32_t res_create_sphere(ResourceManager *resource_manager, const char *textur
       // TODO: удалить выделенные ресурсы
       return INVALID_RESOURCE;
     }
-    sphere->texture_id = texture_id == INVALID_RESOURCE ? 0 : texture_id;
+    sphere->texture_id = texture_id;
   }
   Attribute attributes[] = {
     (Attribute){
@@ -173,16 +170,13 @@ uint32_t res_create_sphere(ResourceManager *resource_manager, const char *textur
       .type = GL_FLOAT,
     },
   };
-  size_t attributes_size = sizeof(attributes) / sizeof(attributes[0]);
-  size_t vertices_size = get_sphere_vertices_size(sphere);
-  size_t indices_size = get_sphere_indices_size(sphere);
   uint32_t mesh_id = res_create_mesh(resource_manager, (MeshProperties){
                                                          .vertices = sphere->vertices.buf,
-                                                         .vertices_size = vertices_size,
+                                                         .vertices_size = get_sphere_vertices_size(sphere),
                                                          .indices = sphere->indices.buf,
-                                                         .indices_size = indices_size,
+                                                         .indices_size = get_sphere_indices_size(sphere),
                                                          .attributes = attributes,
-                                                         attributes_size = attributes_size,
+                                                         .attributes_size = 3,
                                                          .render_mode = GL_STATIC_DRAW,
                                                        });
   if (mesh_id == INVALID_RESOURCE) {
@@ -194,37 +188,31 @@ uint32_t res_create_sphere(ResourceManager *resource_manager, const char *textur
 }
 
 Mesh *res_get_mesh(const ResourceManager *resource_manager, uint32_t mesh_id) {
-  if (!resource_manager) return NULL;
   if (mesh_id < 0 || mesh_id >= resource_manager->meshes.len) return NULL;
   return &resource_manager->meshes.buf[mesh_id];
 }
 
 uint32_t res_get_texture(const ResourceManager *resource_manager, uint32_t texture_id) {
-  if (!resource_manager) return INVALID_RESOURCE;
   if (texture_id < 0 || texture_id >= resource_manager->textures.len) return INVALID_RESOURCE;
   return resource_manager->textures.buf[texture_id];
 }
 
 ShaderPipeline *res_get_shader_pipeline(const ResourceManager *resource_manager, uint32_t shader_pipeline_id) {
-  if (!resource_manager) return NULL;
   if (shader_pipeline_id < 0 || shader_pipeline_id >= resource_manager->shader_pipelines.len) return NULL;
   return &resource_manager->shader_pipelines.buf[shader_pipeline_id];
 }
 
 Font *res_get_font(const ResourceManager *resource_manager, uint32_t font_id) {
-  if (!resource_manager) return NULL;
   if (font_id < 0 || font_id >= resource_manager->shader_pipelines.len) return NULL;
   return &resource_manager->fonts.buf[font_id];
 }
 
 Sphere *res_get_sphere(const ResourceManager *resource_manager, uint32_t sphere_id) {
-  if (!resource_manager) return NULL;
   if (sphere_id < 0 || sphere_id >= resource_manager->spheres.len) return NULL;
   return &resource_manager->spheres.buf[sphere_id];
 }
 
 void res_remove_all(ResourceManager *resource_manager) {
-  if (!resource_manager) return;
   for (int i = 0; i < resource_manager->meshes.len; i++) {
     mesh_remove(&resource_manager->meshes.buf[i]);
   }
@@ -236,6 +224,9 @@ void res_remove_all(ResourceManager *resource_manager) {
   }
   for (int i = 0; i < resource_manager->spheres.len; i++) {
     sphere_remove(&resource_manager->spheres.buf[i]);
+  }
+  for (int i = 0; i < resource_manager->fonts.len; i++) {
+    font_remove(&resource_manager->fonts.buf[i]);
   }
   free(resource_manager->meshes.buf);
   free(resource_manager->textures.buf);
