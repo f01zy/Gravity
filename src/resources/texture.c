@@ -4,7 +4,7 @@
 #include <stb_image.h>
 #include <stdint.h>
 
-#include "texture.h"
+#include "resources/texture.h"
 
 TextureInitStatus texture_initialize(uint32_t *texture, const char *path) {
   if (!texture || !path) return TEXTURE_INIT_MISSING_DATA;

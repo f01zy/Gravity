@@ -2,16 +2,16 @@
 #include <stdint.h>
 #include <stdio.h>
 
-#include "defines.h"
-#include "renderer.h"
-#include "resource_manager.h"
-#include "shader.h"
+#include "core/defines.h"
+#include "renderer/renderer.h"
+#include "resources/resource_manager.h"
+#include "resources/shader.h"
 
 void render_sphere(const ResourceManager *resource_manager, uint32_t sphere_id, uint32_t shader_pipeline_id) {
   Sphere *sphere = res_get_sphere(resource_manager, sphere_id);
   const ShaderPipeline *shader_pipeline = res_get_shader_pipeline(resource_manager, shader_pipeline_id);
-  const Mesh *mesh = res_get_mesh(resource_manager, sphere->mesh);
-  const uint32_t texture = res_get_texture(resource_manager, sphere->texture);
+  const Mesh *mesh = res_get_mesh(resource_manager, sphere->mesh_id);
+  const uint32_t texture = res_get_texture(resource_manager, sphere->texture_id);
   size_t len = sizeof(sphere->indices.buf[0]) / sizeof(sphere->indices.buf[0][0]);
   mat4 model = GLM_MAT4_IDENTITY_INIT;
 
@@ -26,6 +26,8 @@ void render_sphere(const ResourceManager *resource_manager, uint32_t sphere_id, 
   glBindVertexArray(0);
   glBindTexture(GL_TEXTURE_2D, 0);
 }
+
+void render_text(const ResourceManager *resource_manager, uint32_t font_id, uint32_t font_mesh_id, uint32_t shader_pipeline_id, TextProperties properties) {}
 
 void render_scene(const ResourceManager *resource_manager, Camera *camera, uint32_t shader_pipeline_id) {
   const ShaderPipeline *shader_pipeline = res_get_shader_pipeline(resource_manager, shader_pipeline_id);

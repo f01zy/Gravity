@@ -26,18 +26,27 @@ typedef struct {
   float radius;
   int sectors;
   int stacks;
-  uint32_t texture;
-  uint32_t mesh;
+  uint32_t texture_id;
+  uint32_t mesh_id;
   Vertices vertices;
   Indices indices;
 } Sphere;
+
+typedef struct {
+  vec3 position;
+  vec3 velocity;
+  float weight;
+  float radius;
+  int sectors;
+  int stacks;
+} SphereProperties;
 
 typedef enum {
   SPHERE_INIT_MISSING_DATA,
   SPHERE_INIT_SUCCESS,
 } SphereInitStatus;
 
-SphereInitStatus sphere_initialize(Sphere *sphere, vec3 position, vec3 velocity, float weight, float radius, int sectors, int stacks);
+SphereInitStatus sphere_initialize(Sphere *sphere, SphereProperties properties);
 void sphere_remove(Sphere *sphere);
 size_t get_sphere_vertices_size(const Sphere *sphere);
 size_t get_sphere_indices_size(const Sphere *sphere);

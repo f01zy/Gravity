@@ -2,15 +2,16 @@
 #include <stdbool.h>
 #include <stdint.h>
 
-#include "defines.h"
-#include "shader.h"
-#include "utility.h"
+#include "core/defines.h"
+#include "core/utility.h"
+#include "resources/shader.h"
 
 bool shader_initialize(uint32_t shader_program, uint32_t shader, const char *path) {
   char buf[MAX_FILE_LEN];
   const char *source = buf;
   int success;
-  read_file_source(path, buf, sizeof(buf));
+  bool status = utility_read_file(path, buf, sizeof(buf));
+  if (!status) return false;
   glShaderSource(shader, 1, &source, NULL);
   glCompileShader(shader);
   glGetShaderiv(shader, GL_COMPILE_STATUS, &success);

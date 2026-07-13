@@ -8,13 +8,28 @@ set(GLFW_BUILD_WAYLAND ON)
 set(GLFW_BUILD_X11 OFF)
 set(OpenGL_GL_PREFERENCE GLVND)
 set(TARGET gravity)
+set(SOURCE
+  ./src/game/main.c
+  ./src/core/time.c
+  ./src/core/utility.c
+  ./src/physics/physics.c
+  ./src/renderer/camera.c
+  ./src/renderer/renderer.c
+  ./src/renderer/hud.c
+  ./src/resources/font.c
+  ./src/resources/mesh.c
+  ./src/resources/shader.c
+  ./src/resources/sphere.c
+  ./src/resources/texture.c
+  ./src/resources/resource_manager.c
+)
 
-file(GLOB SOURCE ./src/*.c)
 add_executable(${TARGET} ${SOURCE})
 find_package(OpenGL REQUIRED)
 add_subdirectory(./third_party/glfw)
 add_subdirectory(./third_party/cglm)
 add_subdirectory(./third_party/glad)
+add_subdirectory(./third_party/freetype)
 
 target_include_directories(${TARGET} PRIVATE 
   ${CMAKE_CURRENT_SOURCE_DIR}/src
@@ -26,4 +41,5 @@ target_link_libraries(${TARGET} PRIVATE
   glad
   cglm
   glfw
+  freetype
 )

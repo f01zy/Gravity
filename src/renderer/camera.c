@@ -1,8 +1,7 @@
 #include <cglm/cglm.h>
 #include <math.h>
 
-#include "camera.h"
-#include "cglm/vec3.h"
+#include "renderer/camera.h"
 
 vec3 world_up = {0.0f, 1.0f, 0.0f};
 vec3 target = {0.0f, 0.0f, 0.0f};

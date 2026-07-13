@@ -1,19 +1,16 @@
 #include <cglm/cglm.h>
-#include <stdio.h>
 
-#include "cglm/vec3.h"
-#include "defines.h"
-#include "physics.h"
-#include "resource_manager.h"
-#include "sphere.h"
+#include "core/defines.h"
+#include "physics/physics.h"
+#include "resources/sphere.h"
 
-void physics_apply_gravity(ResourceManager *resource_manager, float deltatime) {
-  for (int i = 0; i < resource_manager->spheres.len; i++) {
-    Sphere *sphere = &resource_manager->spheres.buf[i];
+void physics_apply_gravity(Sphere *spheres, size_t len, float deltatime) {
+  for (int i = 0; i < len; i++) {
+    Sphere *sphere = &spheres[i];
     vec3 total_acceleration = GLM_VEC3_ZERO_INIT;
-    for (int j = 0; j < resource_manager->spheres.len; j++) {
+    for (int j = 0; j < len; j++) {
       if (j == i) continue;
-      Sphere *curr = &resource_manager->spheres.buf[j];
+      Sphere *curr = &spheres[j];
       float distance = glm_vec3_distance(curr->position, sphere->position);
       float scalar = GRAVITATIONAL_CONSTANT * curr->weight / (distance * distance);
       vec3 direction;
@@ -29,12 +26,11 @@ void physics_apply_gravity(ResourceManager *resource_manager, float deltatime) {
   }
 }
 
-void physics_move_spheres(const ResourceManager *resource_manager, float deltatime) {
-  for (int i = 0; i < resource_manager->spheres.len; i++) {
-    Sphere *sphere = &resource_manager->spheres.buf[i];
+void physics_move_spheres(Sphere *spheres, size_t len, float deltatime) {
+  for (int i = 0; i < len; i++) {
+    Sphere *sphere = &spheres[i];
     vec3 distance_traveled;
     glm_vec3_scale(sphere->velocity, deltatime, distance_traveled);
     glm_vec3_add(sphere->position, distance_traveled, sphere->position);
-    printf("Sphere %d velocity: (%f, %f, %f)\n", i, sphere->velocity[0], sphere->velocity[1], sphere->velocity[2]);
   }
 }

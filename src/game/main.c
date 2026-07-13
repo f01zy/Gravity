@@ -5,18 +5,16 @@
 #include <stdint.h>
 #include <stdio.h>
 
-#include "camera.h"
-#include "defines.h"
-#include "physics.h"
-#include "renderer.h"
-#include "resource_manager.h"
+#include "core/defines.h"
+#include "core/time.h"
+#include "physics/physics.h"
+#include "renderer/camera.h"
+#include "renderer/renderer.h"
+#include "resources/resource_manager.h"
 
 Camera camera;
 float last_mouse_x;
 float last_mouse_y;
-float last_frame = 0.0f;
-float deltatime = 0.0f;
-vec3 cubes[] = {{0.0f, 0.0f, 0.0f}};
 bool is_first_mouse = true;
 
 void handle_keyboard(GLFWwindow *window, float deltatime) {
@@ -72,40 +70,54 @@ int main() {
   printf("[LOG] Loaded OpenGL %d.%d\n", GLAD_VERSION_MAJOR(version), GLAD_VERSION_MINOR(version));
 
   glEnable(GL_DEPTH_TEST);
-  camera_initialize(&camera);
+  glEnable(GL_BLEND);
+  glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
   ResourceManager resource_manager = {0};
-  uint32_t shader_pipeline_id = res_create_shader_pipeline(&resource_manager, "../src/shaders/vertex.glsl", "../src/shaders/fragment.glsl");
-  if (shader_pipeline_id == INVALID_RESOURCE) {
+  Time time = {0};
+  time.fps = FPS;
+
+  uint32_t base_shader_pipeline_id = res_create_shader_pipeline(&resource_manager, "../src/shaders/base.vert", "../src/shaders/base.frag");
+  uint32_t text_shader_pipeline_id = res_create_shader_pipeline(&resource_manager, "../src/shaders/text.vert", "../src/shaders/text.frag");
+  uint32_t font_id = res_create_font(&resource_manager, "../resources/fonts/Tamzen8x16b.ttf", 16);
+  uint32_t text_mesh = res_create_text_mesh(&resource_manager);
+
+  if (base_shader_pipeline_id == INVALID_RESOURCE || text_shader_pipeline_id == INVALID_RESOURCE || font_id == INVALID_RESOURCE) {
     printf("[ERROR] Failed to create resources\n");
     glfwTerminate();
     return 1;
   }
 
-  vec3 position1 = {0.0f, 0.0f, 0.0f};
-  vec3 velocity1 = {0.0f, 0.0f, 0.0f};
-  res_create_sphere(&resource_manager, position1, velocity1, 3000000000000.0f, 10.0f, 72, 24, "../resources/textures/earth.jpg");
+  camera_initialize(&camera);
+  res_create_sphere(&resource_manager, "../resources/textures/earth.jpg",
+                    (SphereProperties){
+                      .position = {0.0f, 0.0f, 0.0f},
+                      .velocity = {0.0f, 0.0f, 0.0f},
+                      .weight = 3000000000000.0f,
+                      .radius = 10.0f,
+                      .sectors = 72,
+                      .stacks = 24,
+                    });
 
-  vec3 position2 = {0.0f, 0.0f, 30.0f};
-  vec3 velocity2 = {2.583f, 0.0f, 0.0f};
-  res_create_sphere(&resource_manager, position2, velocity2, 1000000.0f, 3.0f, 72, 24, "../resources/textures/mercury.jpg");
-
-  vec3 position3 = {50.0f, 0.0f, 0.0f};
-  vec3 velocity3 = {0.0f, 0.0f, 2.583f};
-  res_create_sphere(&resource_manager, position3, velocity3, 1000000.0f, 3.0f, 72, 24, "../resources/textures/mercury.jpg");
+  res_create_sphere(&resource_manager, "../resources/textures/mercury.jpg",
+                    (SphereProperties){
+                      .position = {0.0f, 0.0f, 30.0f},
+                      .velocity = {2.583f, 0.0f, 0.0f},
+                      .weight = 1000000.0f,
+                      .radius = 3.0f,
+                      .sectors = 72,
+                      .stacks = 24,
+                    });
 
   while (!glfwWindowShouldClose(window)) {
-    float now = glfwGetTime();
-    float need = 1.0f / FPS;
-    deltatime = now - last_frame;
-    if (deltatime < need) continue;
-    last_frame = now;
+    if (!time_check_fps(&time)) continue;
     glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    handle_keyboard(window, deltatime);
-    physics_apply_gravity(&resource_manager, deltatime);
-    physics_move_spheres(&resource_manager, deltatime);
-    render_scene(&resource_manager, &camera, shader_pipeline_id);
+    handle_keyboard(window, time.deltatime);
+    physics_apply_gravity(resource_manager.spheres.buf, resource_manager.spheres.len, time.deltatime);
+    physics_move_spheres(resource_manager.spheres.buf, resource_manager.spheres.len, time.deltatime);
+    render_scene(&resource_manager, &camera, base_shader_pipeline_id);
 
     glfwPollEvents();
     glfwSwapBuffers(window);

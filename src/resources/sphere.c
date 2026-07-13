@@ -1,18 +1,22 @@
 #include <cglm/cglm.h>
 #include <glad/gl.h>
 #include <math.h>
-#include <stdio.h>
 #include <string.h>
 
-#include "defines.h"
-#include "sphere.h"
+#include "core/defines.h"
+#include "resources/sphere.h"
 
-SphereInitStatus sphere_initialize(Sphere *sphere, vec3 position, vec3 velocity, float weight, float radius, int sectors, int stacks) {
+SphereInitStatus sphere_initialize(Sphere *sphere, SphereProperties properties) {
   if (!sphere) return SPHERE_INIT_MISSING_DATA;
 
+  float weight = properties.weight;
+  float radius = properties.radius;
+  int sectors = properties.sectors;
+  int stacks = properties.stacks;
+
   memset(sphere, 0, sizeof(Sphere));
-  glm_vec3_copy(position, sphere->position);
-  glm_vec3_copy(velocity, sphere->velocity);
+  glm_vec3_copy(properties.position, sphere->position);
+  glm_vec3_copy(properties.velocity, sphere->velocity);
   sphere->weight = weight;
   sphere->radius = radius;
   sphere->sectors = sectors;
