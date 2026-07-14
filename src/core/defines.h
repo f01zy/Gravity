@@ -6,7 +6,9 @@
 #define HEIGHT                 (600)
 #define FPS                    (60)
 #define PI                     (3.1415927f)
-#define GRAVITATIONAL_CONSTANT (6.6743 * 1e-11)
+#define GRAVITATIONAL_CONSTANT (6.6743f * 1e-11f)
+#define WORLD_SCALE            (1.0f / 10000000.0f)
+#define TIME_SPEED             (100000.0f)
 
 #define MAX_CAMERA_RADIUS      (100.0f)
 #define MAX_FILE_LEN           (8192)

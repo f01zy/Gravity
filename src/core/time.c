@@ -1,6 +1,6 @@
 #include <stdbool.h>
 
-#include "GLFW/glfw3.h"
+#include "core/graphics.h"
 #include "time.h"
 
 bool time_check_fps(Time *time) {

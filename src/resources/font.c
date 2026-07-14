@@ -1,7 +1,7 @@
 #include <freetype/freetype.h>
-#include <glad/gl.h>
 #include <stdint.h>
 
+#include "core/graphics.h"
 #include "resources/font.h"
 
 FontInitStatus font_initialize(Font *font, const char *path, int size) {

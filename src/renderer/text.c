@@ -1,16 +1,17 @@
-#include <glad/gl.h>
 #include <stdio.h>
 #include <string.h>
 
+#include "core/graphics.h"
+#include "renderer/context.h"
 #include "renderer/text.h"
 #include "resources/font.h"
 #include "resources/resource_manager.h"
 #include "resources/shader.h"
 
-void render_text(const ResourceManager *resource_manager, TextResources resources, TextProperties properties) {
-  const ShaderPipeline *shader_pipeline = res_get_shader_pipeline(resource_manager, resources.shader_pipeline_id);
-  const Mesh *mesh = res_get_mesh(resource_manager, resources.mesh_id);
-  const Font *font = res_get_font(resource_manager, resources.font_id);
+void render_text(const Context *ctx, TextResources resources, TextProperties properties) {
+  const ShaderPipeline *shader_pipeline = res_get_shader_pipeline(ctx->resource_manager, resources.shader_pipeline_id);
+  const Mesh *mesh = res_get_mesh(ctx->resource_manager, resources.mesh_id);
+  const Font *font = res_get_font(ctx->resource_manager, resources.font_id);
 
   if (!shader_pipeline || !mesh || !font) {
     printf("[ERROR] Failed to render the text, because the resources weren't found\n");
@@ -21,9 +22,8 @@ void render_text(const ResourceManager *resource_manager, TextResources resource
   glActiveTexture(GL_TEXTURE0);
   glBindVertexArray(mesh->VAO);
 
-  // TODO: передать размеры окна извне
   mat4 projection;
-  glm_ortho(0.0f, 800.0f, 0.0f, 600.0f, 0.0f, 100.0f, projection);
+  glm_ortho(0.0f, ctx->window_size[0], 0.0f, ctx->window_size[1], 0.0f, 100.0f, projection);
   uniform_set_mat4(shader_pipeline->shader_program, "projection", projection);
   uniform_set_vec3(shader_pipeline->shader_program, "text_color", properties.color);
 

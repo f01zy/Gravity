@@ -1,8 +1,8 @@
-#include <glad/gl.h>
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdio.h>
 
+#include "core/graphics.h"
 #include "utility.h"
 
 bool utility_read_file(const char *path, char *buf, size_t size) {

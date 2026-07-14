@@ -4,7 +4,7 @@
 #include <cglm/cglm.h>
 #include <stdint.h>
 
-#include "resources/resource_manager.h"
+#include "renderer/context.h"
 
 typedef struct {
   const char *text;
@@ -19,6 +19,6 @@ typedef struct {
   uint32_t shader_pipeline_id;
 } TextResources;
 
-void render_text(const ResourceManager *resource_manager, TextResources resources, TextProperties properties);
+void render_text(const Context *ctx, TextResources resources, TextProperties properties);
 
 #endif

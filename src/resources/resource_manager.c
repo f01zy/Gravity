@@ -1,10 +1,10 @@
-#include <glad/gl.h>
 #include <stddef.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 
 #include "core/defines.h"
+#include "core/graphics.h"
 #include "resources/font.h"
 #include "resources/mesh.h"
 #include "resources/resource_manager.h"

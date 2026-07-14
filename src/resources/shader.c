@@ -1,8 +1,8 @@
-#include <glad/gl.h>
 #include <stdbool.h>
 #include <stdint.h>
 
 #include "core/defines.h"
+#include "core/graphics.h"
 #include "core/utility.h"
 #include "resources/shader.h"
 

@@ -1,64 +1,44 @@
-#include <glad/gl.h>
-
-#include <GLFW/glfw3.h>
 #include <cglm/cglm.h>
 #include <stdint.h>
 #include <stdio.h>
 
 #include "core/defines.h"
+#include "core/graphics.h"
 #include "core/time.h"
+#include "game/input.h"
 #include "physics/physics.h"
 #include "renderer/camera.h"
+#include "renderer/context.h"
 #include "renderer/hud.h"
 #include "renderer/renderer.h"
-#include "renderer/text.h"
 #include "resources/resource_manager.h"
-
-Camera camera;
-float last_mouse_x;
-float last_mouse_y;
-bool is_first_mouse = true;
-
-void handle_keyboard(GLFWwindow *window, float deltatime) {
-  if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) glfwSetWindowShouldClose(window, true);
-}
-
-void mouse_scroll_callback(GLFWwindow *window, double xoffset, double yoffset) {
-  float radius = camera.radius - yoffset;
-  if (radius >= 0.0f && radius <= MAX_CAMERA_RADIUS) camera.radius = radius;
-}
-
-void mouse_position_callback(GLFWwindow *window, double xpos, double ypos) {
-  if (is_first_mouse) {
-    last_mouse_x = xpos;
-    last_mouse_y = ypos;
-    is_first_mouse = false;
-  }
-  float xoffset = xpos - last_mouse_x;
-  float yoffset = ypos - last_mouse_y;
-  last_mouse_x = xpos;
-  last_mouse_y = ypos;
-  if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS) {
-    camera.pitch = glm_clamp(camera.pitch + yoffset, -89.0f, 89.0f);
-    camera.yaw += xoffset;
-  }
-}
 
 int main() {
   if (!glfwInit()) {
     printf("[ERROR] Failed to initialize GLFW\n");
     return 1;
   }
+  ResourceManager resource_manager = {0};
+  Camera camera = {0};
+  Time time = {.fps = FPS};
+  Context ctx = {
+    .resource_manager = &resource_manager,
+    .camera = &camera,
+    .time = &time,
+    .window_size = {WIDTH, HEIGHT},
+  };
   glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
   glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
   glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
   glfwWindowHint(GLFW_RESIZABLE, GL_FALSE);
-  GLFWwindow *window = glfwCreateWindow(WIDTH, HEIGHT, TITLE, NULL, NULL);
+  GLFWwindow *window = glfwCreateWindow(ctx.window_size[0], ctx.window_size[1], TITLE, NULL, NULL);
   if (!window) {
     printf("[ERROR] Failed to create window\n");
     glfwTerminate();
     return 1;
   }
+  camera_initialize(&camera);
+  glfwSetWindowUserPointer(window, &ctx);
   glfwMakeContextCurrent(window);
   glfwSetScrollCallback(window, mouse_scroll_callback);
   glfwSetCursorPosCallback(window, mouse_position_callback);
@@ -74,9 +54,6 @@ int main() {
   glEnable(GL_BLEND);
   glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-  ResourceManager resource_manager = {0};
-  Time time = {0};
-  time.fps = FPS;
   uint32_t base_shader_pipeline_id = res_create_shader_pipeline(&resource_manager, "../src/shaders/base.vert", "../src/shaders/base.frag");
   uint32_t text_shader_pipeline_id = res_create_shader_pipeline(&resource_manager, "../src/shaders/text.vert", "../src/shaders/text.frag");
   uint32_t font_id = res_create_font(&resource_manager, "../resources/fonts/Tamzen8x16b.ttf", 16);
@@ -89,23 +66,22 @@ int main() {
     return 1;
   }
 
-  camera_initialize(&camera);
   res_create_sphere(&resource_manager, "../resources/textures/earth.jpg",
                     (SphereProperties){
                       .position = {0.0f, 0.0f, 0.0f},
                       .velocity = {0.0f, 0.0f, 0.0f},
-                      .weight = 3000000000000.0f,
-                      .radius = 10.0f,
+                      .weight = 5.972e24f,
+                      .radius = 6371000.0f,
                       .sectors = 72,
                       .stacks = 24,
                     });
 
   res_create_sphere(&resource_manager, "../resources/textures/mercury.jpg",
                     (SphereProperties){
-                      .position = {0.0f, 0.0f, 30.0f},
-                      .velocity = {2.583f, 0.0f, 0.0f},
-                      .weight = 1000000.0f,
-                      .radius = 3.0f,
+                      .position = {0.0f, 0.0f, 384400000.0f},
+                      .velocity = {1018.289f, 0.0f, 0.0f},
+                      .weight = 7.35e22f,
+                      .radius = 1737500.0f,
                       .sectors = 72,
                       .stacks = 24,
                     });
@@ -115,11 +91,14 @@ int main() {
     glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    handle_keyboard(window, time.deltatime);
     physics_apply_gravity(resource_manager.spheres.buf, resource_manager.spheres.len, time.deltatime);
     physics_move_spheres(resource_manager.spheres.buf, resource_manager.spheres.len, time.deltatime);
-    renderer_render_scene(&resource_manager, &camera, base_shader_pipeline_id);
-    hud_render(&resource_manager, (TextResources){.font_id = font_id, .mesh_id = text_mesh_id, .shader_pipeline_id = text_shader_pipeline_id}, time.deltatime);
+    renderer_render_scene(&ctx, base_shader_pipeline_id);
+    hud_render(&ctx, (TextResources){
+                       .font_id = font_id,
+                       .mesh_id = text_mesh_id,
+                       .shader_pipeline_id = text_shader_pipeline_id,
+                     });
 
     glfwPollEvents();
     glfwSwapBuffers(window);

@@ -2,8 +2,9 @@
 #define MESH_INCLUDED
 
 #include <cglm/cglm.h>
-#include <glad/gl.h>
 #include <stddef.h>
+
+#include "core/graphics.h"
 
 typedef struct {
   vec3 position;

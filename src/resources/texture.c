@@ -1,9 +1,9 @@
 #define STB_IMAGE_IMPLEMENTATION
 
-#include <glad/gl.h>
 #include <stb_image.h>
 #include <stdint.h>
 
+#include "core/graphics.h"
 #include "resources/texture.h"
 
 TextureInitStatus texture_initialize(uint32_t *texture, const char *path) {

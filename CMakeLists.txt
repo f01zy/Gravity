@@ -10,6 +10,7 @@ set(OpenGL_GL_PREFERENCE GLVND)
 set(TARGET gravity)
 set(SOURCE
   ./src/game/main.c
+  ./src/game/input.c
   ./src/core/time.c
   ./src/core/utility.c
   ./src/physics/physics.c

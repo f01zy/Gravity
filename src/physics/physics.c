@@ -21,7 +21,7 @@ void physics_apply_gravity(Sphere *spheres, size_t len, float deltatime) {
       glm_vec3_add(total_acceleration, curr_acceleration, total_acceleration);
     }
     vec3 accumulative_velocity;
-    glm_vec3_scale(total_acceleration, deltatime, accumulative_velocity);
+    glm_vec3_scale(total_acceleration, deltatime * TIME_SPEED, accumulative_velocity);
     glm_vec3_add(sphere->velocity, accumulative_velocity, sphere->velocity);
   }
 }
@@ -30,7 +30,7 @@ void physics_move_spheres(Sphere *spheres, size_t len, float deltatime) {
   for (int i = 0; i < len; i++) {
     Sphere *sphere = &spheres[i];
     vec3 distance_traveled;
-    glm_vec3_scale(sphere->velocity, deltatime, distance_traveled);
+    glm_vec3_scale(sphere->velocity, deltatime * TIME_SPEED, distance_traveled);
     glm_vec3_add(sphere->position, distance_traveled, sphere->position);
   }
 }

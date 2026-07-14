@@ -1,9 +1,9 @@
 #include <cglm/cglm.h>
-#include <glad/gl.h>
 #include <math.h>
 #include <string.h>
 
 #include "core/defines.h"
+#include "mesh.h"
 #include "resources/sphere.h"
 
 SphereInitStatus sphere_initialize(Sphere *sphere, SphereProperties properties) {
@@ -22,14 +22,13 @@ SphereInitStatus sphere_initialize(Sphere *sphere, SphereProperties properties) 
   sphere->sectors = sectors;
   sphere->stacks = stacks;
 
-  float length_inv = 1.0f / radius;
   float sector_step = PI * 2.0f / (float)sectors;
   float stack_step = PI / (float)stacks;
 
   for (int i = 0; i <= stacks; i++) {
     float stack_angle = PI / 2.0f - stack_step * (float)i;
-    float xz = radius * cosf(stack_angle);
-    float y = radius * sinf(stack_angle);
+    float xz = cosf(stack_angle);
+    float y = sinf(stack_angle);
 
     for (int j = 0; j <= sectors; j++) {
       if (sphere->vertices.len >= sphere->vertices.size) {
@@ -44,12 +43,9 @@ SphereInitStatus sphere_initialize(Sphere *sphere, SphereProperties properties) 
       sphere->vertices.buf[len].position[1] = y;
       sphere->vertices.buf[len].position[2] = z;
 
-      float nx = x * length_inv;
-      float ny = y * length_inv;
-      float nz = z * length_inv;
-      sphere->vertices.buf[len].normal[0] = nx;
-      sphere->vertices.buf[len].normal[1] = ny;
-      sphere->vertices.buf[len].normal[2] = nz;
+      sphere->vertices.buf[len].normal[0] = x;
+      sphere->vertices.buf[len].normal[1] = y;
+      sphere->vertices.buf[len].normal[2] = z;
 
       float s = (float)j / (float)sectors;
       float t = (float)i / (float)stacks;

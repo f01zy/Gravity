@@ -1,6 +1,6 @@
-#include <glad/gl.h>
 #include <stddef.h>
 
+#include "core/graphics.h"
 #include "core/utility.h"
 #include "resources/mesh.h"
 
