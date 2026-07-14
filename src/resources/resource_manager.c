@@ -18,7 +18,7 @@ uint32_t res_create_text_mesh(ResourceManager *resource_manager) {
   return res_create_mesh(resource_manager, (MeshProperties){
                                              .vertices = NULL,
                                              .vertices_size = sizeof(vec4) * 4,
-                                             .indices = indices,
+                                             .indices = (uint32_t *)indices,
                                              .indices_size = sizeof(indices),
                                              .attributes = attributes,
                                              .attributes_size = 1,
@@ -27,7 +27,7 @@ uint32_t res_create_text_mesh(ResourceManager *resource_manager) {
 }
 
 uint32_t res_create_mesh(ResourceManager *resource_manager, MeshProperties properties) {
-  resource_manager->meshes.buf = (Mesh *)realloc(resource_manager->meshes.buf, sizeof(Mesh) * (resource_manager->meshes.len + 1));
+  resource_manager->meshes.buf = realloc(resource_manager->meshes.buf, sizeof(*resource_manager->meshes.buf) * (resource_manager->meshes.len + 1));
   Mesh *mesh = &resource_manager->meshes.buf[resource_manager->meshes.len];
   MeshInitStatus status = mesh_initialize(mesh, properties);
   if (status != MESH_INIT_SUCCESS) {
@@ -53,7 +53,7 @@ uint32_t res_create_mesh(ResourceManager *resource_manager, MeshProperties prope
 }
 
 uint32_t res_create_texture(ResourceManager *resource_manager, const char *path) {
-  resource_manager->textures.buf = (uint32_t *)realloc(resource_manager->textures.buf, sizeof(uint32_t) * (resource_manager->textures.len + 1));
+  resource_manager->textures.buf = realloc(resource_manager->textures.buf, sizeof(*resource_manager->textures.buf) * (resource_manager->textures.len + 1));
   uint32_t *texture = &resource_manager->textures.buf[resource_manager->textures.len];
   TextureInitStatus status = texture_initialize(texture, path);
   if (status != TEXTURE_INIT_SUCCESS) {
@@ -77,8 +77,8 @@ uint32_t res_create_texture(ResourceManager *resource_manager, const char *path)
 }
 
 uint32_t res_create_shader_pipeline(ResourceManager *resource_manager, const char *vertex_shader_path, const char *fragment_shader_path) {
-  size_t new_size = sizeof(ShaderPipeline) * (resource_manager->shader_pipelines.len + 1);
-  resource_manager->shader_pipelines.buf = (ShaderPipeline *)realloc(resource_manager->shader_pipelines.buf, new_size);
+  size_t new_size = sizeof(*resource_manager->shader_pipelines.buf) * (resource_manager->shader_pipelines.len + 1);
+  resource_manager->shader_pipelines.buf = realloc(resource_manager->shader_pipelines.buf, new_size);
   ShaderPipeline *pipeline = &resource_manager->shader_pipelines.buf[resource_manager->shader_pipelines.len];
   PipelineInitStatus status = shader_pipeline_initialize(pipeline, vertex_shader_path, fragment_shader_path);
   if (status != PIPELINE_INIT_SUCCESS) {
@@ -105,7 +105,7 @@ uint32_t res_create_shader_pipeline(ResourceManager *resource_manager, const cha
 }
 
 uint32_t res_create_font(ResourceManager *resource_manager, const char *path, int size) {
-  resource_manager->fonts.buf = (Font *)realloc(resource_manager->fonts.buf, sizeof(Font) * (resource_manager->spheres.len + 1));
+  resource_manager->fonts.buf = realloc(resource_manager->fonts.buf, sizeof(*resource_manager->fonts.buf) * (resource_manager->fonts.len + 1));
   Font *font = &resource_manager->fonts.buf[resource_manager->fonts.len];
   FontInitStatus status = font_initialize(font, path, size);
   if (status != FONT_INIT_SUCCESS) {
@@ -132,7 +132,7 @@ uint32_t res_create_font(ResourceManager *resource_manager, const char *path, in
 }
 
 uint32_t res_create_sphere(ResourceManager *resource_manager, const char *texture_path, SphereProperties properties) {
-  resource_manager->spheres.buf = (Sphere *)realloc(resource_manager->spheres.buf, sizeof(Sphere) * (resource_manager->spheres.len + 1));
+  resource_manager->spheres.buf = realloc(resource_manager->spheres.buf, sizeof(*resource_manager->spheres.buf) * (resource_manager->spheres.len + 1));
   Sphere *sphere = &resource_manager->spheres.buf[resource_manager->spheres.len];
   SphereInitStatus status = sphere_initialize(sphere, properties);
   if (status != SPHERE_INIT_SUCCESS) {
@@ -171,9 +171,9 @@ uint32_t res_create_sphere(ResourceManager *resource_manager, const char *textur
     },
   };
   uint32_t mesh_id = res_create_mesh(resource_manager, (MeshProperties){
-                                                         .vertices = sphere->vertices.buf,
+                                                         .vertices = (float *)sphere->vertices.buf,
                                                          .vertices_size = get_sphere_vertices_size(sphere),
-                                                         .indices = sphere->indices.buf,
+                                                         .indices = (uint32_t *)sphere->indices.buf,
                                                          .indices_size = get_sphere_indices_size(sphere),
                                                          .attributes = attributes,
                                                          .attributes_size = 3,

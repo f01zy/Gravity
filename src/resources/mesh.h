@@ -3,6 +3,7 @@
 
 #include <cglm/cglm.h>
 #include <stddef.h>
+#include <stdint.h>
 
 #include "core/graphics.h"
 
@@ -24,9 +25,9 @@ typedef struct {
 } Mesh;
 
 typedef struct {
-  Vertice *vertices;
+  float *vertices;
   size_t vertices_size;
-  ivec3 *indices;
+  uint32_t *indices;
   size_t indices_size;
   Attribute *attributes;
   size_t attributes_size;

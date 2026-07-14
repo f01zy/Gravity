@@ -1,4 +1,5 @@
 #include <cglm/cglm.h>
+#include <stdbool.h>
 #include <stdint.h>
 #include <stdio.h>
 
@@ -6,6 +7,7 @@
 #include "core/graphics.h"
 #include "core/time.h"
 #include "game/input.h"
+#include "grid/grid.h"
 #include "physics/physics.h"
 #include "renderer/camera.h"
 #include "renderer/context.h"
@@ -18,15 +20,19 @@ int main() {
     printf("[ERROR] Failed to initialize GLFW\n");
     return 1;
   }
+
   ResourceManager resource_manager = {0};
   Camera camera = {0};
+  Grid grid = {0};
   Time time = {.fps = FPS};
   Context ctx = {
     .resource_manager = &resource_manager,
     .camera = &camera,
+    .grid = &grid,
     .time = &time,
     .window_size = {WIDTH, HEIGHT},
   };
+
   glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
   glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
   glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
@@ -37,7 +43,6 @@ int main() {
     glfwTerminate();
     return 1;
   }
-  camera_initialize(&camera);
   glfwSetWindowUserPointer(window, &ctx);
   glfwMakeContextCurrent(window);
   glfwSetScrollCallback(window, mouse_scroll_callback);
@@ -56,15 +61,23 @@ int main() {
 
   uint32_t base_shader_pipeline_id = res_create_shader_pipeline(&resource_manager, "../src/shaders/base.vert", "../src/shaders/base.frag");
   uint32_t text_shader_pipeline_id = res_create_shader_pipeline(&resource_manager, "../src/shaders/text.vert", "../src/shaders/text.frag");
+  uint32_t grid_shader_pipeline_id = res_create_shader_pipeline(&resource_manager, "../src/shaders/grid.vert", "../src/shaders/grid.frag");
   uint32_t font_id = res_create_font(&resource_manager, "../resources/fonts/Tamzen8x16b.ttf", 16);
   uint32_t text_mesh_id = res_create_text_mesh(&resource_manager);
 
-  if (base_shader_pipeline_id == INVALID_RESOURCE || text_shader_pipeline_id == INVALID_RESOURCE || font_id == INVALID_RESOURCE
-      || text_mesh_id == INVALID_RESOURCE) {
+  bool is_created = (base_shader_pipeline_id != INVALID_RESOURCE) & (text_shader_pipeline_id != INVALID_RESOURCE)
+                    & (grid_shader_pipeline_id != INVALID_RESOURCE) & (font_id != INVALID_RESOURCE) & (text_mesh_id != INVALID_RESOURCE);
+
+  if (!is_created) {
     printf("[ERROR] Failed to create the resources\n");
     glfwTerminate();
     return 1;
   }
+
+  vec3 grid_position = {0.0f, 0.0f, 0.0f};
+  vec2 grid_size = {50.0f, 50.0f};
+  grid_initialize(&grid, &resource_manager, grid_position, grid_size);
+  camera_initialize(&camera);
 
   res_create_sphere(&resource_manager, "../resources/textures/earth.jpg",
                     (SphereProperties){
@@ -93,7 +106,7 @@ int main() {
 
     physics_apply_gravity(resource_manager.spheres.buf, resource_manager.spheres.len, time.deltatime);
     physics_move_spheres(resource_manager.spheres.buf, resource_manager.spheres.len, time.deltatime);
-    renderer_render_scene(&ctx, base_shader_pipeline_id);
+    renderer_render_scene(&ctx, base_shader_pipeline_id, grid_shader_pipeline_id);
     hud_render(&ctx, (TextResources){
                        .font_id = font_id,
                        .mesh_id = text_mesh_id,

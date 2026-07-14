@@ -1,13 +1,14 @@
 #include <stddef.h>
+#include <stdint.h>
 
 #include "core/graphics.h"
 #include "core/utility.h"
 #include "resources/mesh.h"
 
 MeshInitStatus mesh_initialize(Mesh *mesh, MeshProperties properties) {
-  Vertice *vertices = properties.vertices;
+  float *vertices = properties.vertices;
   size_t vertices_size = properties.vertices_size;
-  ivec3 *indices = properties.indices;
+  uint32_t *indices = properties.indices;
   size_t indices_size = properties.indices_size;
   Attribute *attributes = properties.attributes;
   size_t attributes_size = properties.attributes_size;

@@ -1,12 +1,26 @@
 #include <stdint.h>
-#include <stdio.h>
 
 #include "core/defines.h"
 #include "core/graphics.h"
+#include "grid/grid.h"
 #include "renderer/context.h"
 #include "renderer/renderer.h"
 #include "resources/resource_manager.h"
 #include "resources/shader.h"
+
+void renderer_render_grid(Grid *grid, const ResourceManager *resource_manager, uint32_t shader_pipeline_id) {
+  const ShaderPipeline *shader_pipeline = res_get_shader_pipeline(resource_manager, shader_pipeline_id);
+  const Mesh *mesh = res_get_mesh(resource_manager, grid->mesh_id);
+  mat4 model = GLM_MAT4_IDENTITY_INIT;
+
+  glUseProgram(shader_pipeline->shader_program);
+  glm_translate(model, grid->position);
+  uniform_set_mat4(shader_pipeline->shader_program, "model", model);
+
+  glBindVertexArray(mesh->VAO);
+  glDrawElements(GL_LINES, sizeof(*grid->indices.buf) * grid->indices.len, GL_UNSIGNED_INT, NULL);
+  glBindVertexArray(0);
+}
 
 void renderer_render_sphere(const ResourceManager *resource_manager, uint32_t sphere_id, uint32_t shader_pipeline_id) {
   Sphere *sphere = res_get_sphere(resource_manager, sphere_id);
@@ -24,17 +38,16 @@ void renderer_render_sphere(const ResourceManager *resource_manager, uint32_t sp
   glm_scale_uni(model, scaled_radius);
   uniform_set_mat4(shader_pipeline->shader_program, "model", model);
   uniform_set_int(shader_pipeline->shader_program, "sphere_texture", 0);
-  printf("(%f, %f, %f)\n", scaled_position[0], scaled_position[1], scaled_position[2]);
 
   glBindTexture(GL_TEXTURE_2D, texture);
   glBindVertexArray(mesh->VAO);
-  glDrawElements(GL_TRIANGLES, sphere->indices.len * 3, GL_UNSIGNED_INT, NULL);
+  glDrawElements(GL_TRIANGLES, sizeof(*sphere->indices.buf) * sphere->indices.len, GL_UNSIGNED_INT, NULL);
   glBindVertexArray(0);
   glBindTexture(GL_TEXTURE_2D, 0);
 }
 
-void renderer_render_scene(const Context *ctx, uint32_t shader_pipeline_id) {
-  const ShaderPipeline *shader_pipeline = res_get_shader_pipeline(ctx->resource_manager, shader_pipeline_id);
+void renderer_render_scene(const Context *ctx, uint32_t base_shader_pipeline_id, uint32_t grid_shader_pipeline_id) {
+  const ShaderPipeline *shader_pipeline = res_get_shader_pipeline(ctx->resource_manager, base_shader_pipeline_id);
 
   glUseProgram(shader_pipeline->shader_program);
   mat4 view;
@@ -45,7 +58,8 @@ void renderer_render_scene(const Context *ctx, uint32_t shader_pipeline_id) {
   uniform_set_mat4(shader_pipeline->shader_program, "view", view);
   uniform_set_mat4(shader_pipeline->shader_program, "projection", projection);
 
+  renderer_render_grid(ctx->grid, ctx->resource_manager, grid_shader_pipeline_id);
   for (int i = 0; i < ctx->resource_manager->spheres.len; i++) {
-    renderer_render_sphere(ctx->resource_manager, i, shader_pipeline_id);
+    renderer_render_sphere(ctx->resource_manager, i, base_shader_pipeline_id);
   }
 }

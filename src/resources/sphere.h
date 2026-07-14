@@ -8,18 +8,6 @@
 #include "mesh.h"
 
 typedef struct {
-  Vertice *buf;
-  size_t len;
-  size_t size;
-} Vertices;
-
-typedef struct {
-  ivec3 *buf;
-  size_t len;
-  size_t size;
-} Indices;
-
-typedef struct {
   vec3 position;
   vec3 velocity;
   float weight;
@@ -28,8 +16,18 @@ typedef struct {
   int stacks;
   uint32_t texture_id;
   uint32_t mesh_id;
-  Vertices vertices;
-  Indices indices;
+
+  struct {
+    Vertice *buf;
+    size_t len;
+    size_t size;
+  } vertices;
+
+  struct {
+    ivec3 *buf;
+    size_t len;
+    size_t size;
+  } indices;
 } Sphere;
 
 typedef struct {

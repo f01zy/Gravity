@@ -33,7 +33,7 @@ SphereInitStatus sphere_initialize(Sphere *sphere, SphereProperties properties) 
     for (int j = 0; j <= sectors; j++) {
       if (sphere->vertices.len >= sphere->vertices.size) {
         sphere->vertices.size = (sphere->vertices.size + 1) * 2;
-        sphere->vertices.buf = (Vertice *)realloc(sphere->vertices.buf, sizeof(Vertice) * sphere->vertices.size);
+        sphere->vertices.buf = realloc(sphere->vertices.buf, sizeof(*sphere->vertices.buf) * sphere->vertices.size);
       }
       float sector_angle = sector_step * (float)j;
       float x = xz * sinf(sector_angle);
@@ -61,7 +61,7 @@ SphereInitStatus sphere_initialize(Sphere *sphere, SphereProperties properties) 
     for (int j = 0; j < sectors; j++, k1++, k2++) {
       if (sphere->indices.len >= sphere->indices.size) {
         sphere->indices.size = (sphere->indices.size + 1) * 2;
-        sphere->indices.buf = (ivec3 *)realloc(sphere->indices.buf, sizeof(ivec3) * sphere->indices.size);
+        sphere->indices.buf = realloc(sphere->indices.buf, sizeof(*sphere->indices.buf) * sphere->indices.size);
       }
       if (i) {
         size_t len = sphere->indices.len;
@@ -88,6 +88,6 @@ void sphere_remove(Sphere *sphere) {
   free(sphere->indices.buf);
 }
 
-size_t get_sphere_vertices_size(const Sphere *sphere) { return sizeof(sphere->vertices.buf[0]) * sphere->vertices.len; }
+size_t get_sphere_vertices_size(const Sphere *sphere) { return sizeof(*sphere->vertices.buf) * sphere->vertices.len; }
 
-size_t get_sphere_indices_size(const Sphere *sphere) { return sizeof(sphere->indices.buf[0]) * sphere->indices.len; }
+size_t get_sphere_indices_size(const Sphere *sphere) { return sizeof(*sphere->indices.buf) * sphere->indices.len; }

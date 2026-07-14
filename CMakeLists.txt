@@ -14,6 +14,7 @@ set(SOURCE
   ./src/core/time.c
   ./src/core/utility.c
   ./src/physics/physics.c
+  ./src/grid/grid.c
   ./src/renderer/camera.c
   ./src/renderer/renderer.c
   ./src/renderer/text.c
