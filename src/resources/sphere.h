@@ -10,8 +10,8 @@
 typedef struct {
   vec3 position;
   vec3 velocity;
-  float weight;
-  float radius;
+  double weight;
+  double radius;
   int sectors;
   int stacks;
   uint32_t texture_id;
@@ -33,8 +33,8 @@ typedef struct {
 typedef struct {
   vec3 position;
   vec3 velocity;
-  float weight;
-  float radius;
+  double weight;
+  double radius;
   int sectors;
   int stacks;
 } SphereProperties;

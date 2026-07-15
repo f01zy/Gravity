@@ -8,8 +8,7 @@
 bool utility_read_file(const char *path, char *buf, size_t size) {
   FILE *file = fopen(path, "r");
   if (!file) return false;
-  size_t count = fread(buf, sizeof(char), size - 1, file);
-  buf[count] = '\0';
+  buf[fread(buf, sizeof(char), size - 1, file)] = '\0';
   fclose(file);
   return true;
 }

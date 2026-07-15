@@ -14,6 +14,9 @@ typedef struct {
   Grid *grid;
   Time *time;
   vec2 window_size;
+  const char *window_title;
+  float time_scale;
+  float world_scale;
 } Context;
 
 #endif

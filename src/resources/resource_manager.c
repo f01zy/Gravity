@@ -69,7 +69,7 @@ uint32_t res_create_texture(ResourceManager *resource_manager, const char *path)
       err = "Failed to initialize the texture";
       break;
     }
-    printf("[ERROR] %s\n", err);
+    printf("[ERROR] %s: %s\n", err, path);
     return INVALID_RESOURCE;
   }
   printf("[LOG] The texture was successfully created: %s\n", path);
@@ -97,7 +97,7 @@ uint32_t res_create_shader_pipeline(ResourceManager *resource_manager, const cha
       err = "Failed to initialize the shader pipeline";
       break;
     }
-    printf("[ERROR] %s\n", err);
+    printf("[ERROR] %s: %s\n", err, vertex_shader_path);
     return INVALID_RESOURCE;
   }
   printf("[LOG] The shader pipeline was successfully created: %s\n", vertex_shader_path);
@@ -124,7 +124,7 @@ uint32_t res_create_font(ResourceManager *resource_manager, const char *path, in
       err = "Failed to initialize font";
       break;
     }
-    printf("[ERROR] %s\n", err);
+    printf("[ERROR] %s: %s\n", err, path);
     return INVALID_RESOURCE;
   }
   printf("[LOG] The font was successfully created: %s\n", path);
@@ -151,7 +151,7 @@ uint32_t res_create_sphere(ResourceManager *resource_manager, const char *textur
   if (texture_path) {
     uint32_t texture_id = res_create_texture(resource_manager, texture_path);
     if (texture_id == INVALID_RESOURCE) {
-      // TODO: удалить выделенные ресурсы
+      sphere_remove(sphere);
       return INVALID_RESOURCE;
     }
     sphere->texture_id = texture_id;
@@ -180,7 +180,8 @@ uint32_t res_create_sphere(ResourceManager *resource_manager, const char *textur
                                                          .render_mode = GL_STATIC_DRAW,
                                                        });
   if (mesh_id == INVALID_RESOURCE) {
-    // TODO: удалить выделенные ресурсы
+    texture_remove(resource_manager->textures.buf[sphere->texture_id]);
+    sphere_remove(sphere);
     return INVALID_RESOURCE;
   }
   sphere->mesh_id = mesh_id;

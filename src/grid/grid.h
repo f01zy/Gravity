@@ -10,6 +10,7 @@
 typedef struct {
   vec3 position;
   vec2 size;
+  ivec2 resolution;
   uint32_t mesh_id;
 
   struct {
@@ -18,12 +19,13 @@ typedef struct {
   } vertices;
 
   struct {
-    vec2 *buf;
+    ivec2 *buf;
     size_t len;
   } indices;
 } Grid;
 
 void grid_update_vertices(const Grid *grid, const ResourceManager *resource_manager);
-void grid_initialize(Grid *grid, ResourceManager *resource_manager, vec3 position, vec2 size);
+void grid_initialize(Grid *grid, ResourceManager *resource_manager, vec3 position, vec2 size, ivec2 resolution);
+void grid_remove(const Grid *grid);
 
 #endif
