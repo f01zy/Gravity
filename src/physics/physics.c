@@ -1,6 +1,7 @@
 #include <cglm/cglm.h>
 #include <math.h>
 #include <stddef.h>
+#include <stdio.h>
 
 #include "core/defines.h"
 #include "grid/grid.h"
@@ -8,15 +9,15 @@
 #include "resources/sphere.h"
 
 void physics_calculate_grid(Grid *grid, Sphere *spheres, size_t len, float world_scale) {
-  int w = grid->resolution[0] + 1;
-  int h = grid->resolution[1] + 1;
-  float step_x = grid->size[0] / w;
-  float step_z = grid->size[1] / h;
-  float half_w = w / 2.0f;
-  float half_h = h / 2.0f;
-  for (int i = 0; i < h; i++) {
-    for (int j = 0; j < w; j++) {
-      size_t curr_vertice = i * w + j;
+  int res_x = grid->resolution[0] + 1;
+  int res_y = grid->resolution[1] + 1;
+  float step_x = grid->size[0] / res_x;
+  float step_z = grid->size[1] / res_y;
+  float half_w = grid->size[0] / 2.0f;
+  float half_h = grid->size[1] / 2.0f;
+  for (int i = 0; i < res_y; i++) {
+    for (int j = 0; j < res_x; j++) {
+      size_t curr_vertice = i * res_x + j;
       vec3 absolute_position;
       vec3 vertex_position = {
         -half_w + step_x * j,
@@ -31,7 +32,7 @@ void physics_calculate_grid(Grid *grid, Sphere *spheres, size_t len, float world
         float dx = absolute_position[0] - sphere->position[0];
         float dz = absolute_position[2] - sphere->position[2];
         float distance = dx * dx + dz * dz;
-        float y = -(GRAVITATIONAL_CONSTANT * sphere->weight) / sqrt(distance + GRAVITY_SMOOTH * GRAVITY_SMOOTH);
+        float y = -(GRAVITATIONAL_CONSTANT * sphere->mass) / sqrt(distance + GRAVITY_SMOOTH * GRAVITY_SMOOTH);
         vertex_position[1] += y * world_scale;
       }
       glm_vec3_copy(vertex_position, grid->vertices.buf[curr_vertice]);
@@ -47,7 +48,7 @@ void physics_apply_gravity(Sphere *spheres, size_t len, float time_scale, float 
       if (j == i) continue;
       Sphere *curr = &spheres[j];
       float distance = glm_vec3_distance(curr->position, sphere->position);
-      float scalar = GRAVITATIONAL_CONSTANT * curr->weight / (distance * distance);
+      float scalar = GRAVITATIONAL_CONSTANT * curr->mass / (distance * distance);
       vec3 direction;
       vec3 curr_acceleration;
       glm_vec3_sub(curr->position, sphere->position, direction);

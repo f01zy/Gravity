@@ -9,15 +9,16 @@
 SphereInitStatus sphere_initialize(Sphere *sphere, SphereProperties properties) {
   if (!sphere) return SPHERE_INIT_MISSING_DATA;
 
-  float weight = properties.weight;
+  float mass = properties.mass;
   float radius = properties.radius;
   int sectors = properties.sectors;
   int stacks = properties.stacks;
+  if (mass <= 0 || radius <= 0) return SPHERE_INIT_DATA_ERROR;
 
   memset(sphere, 0, sizeof(Sphere));
   glm_vec3_copy(properties.position, sphere->position);
   glm_vec3_copy(properties.velocity, sphere->velocity);
-  sphere->weight = weight;
+  sphere->mass = mass;
   sphere->radius = radius;
   sphere->sectors = sectors;
   sphere->stacks = stacks;

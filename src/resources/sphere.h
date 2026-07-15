@@ -10,7 +10,7 @@
 typedef struct {
   vec3 position;
   vec3 velocity;
-  double weight;
+  double mass;
   double radius;
   int sectors;
   int stacks;
@@ -33,7 +33,7 @@ typedef struct {
 typedef struct {
   vec3 position;
   vec3 velocity;
-  double weight;
+  double mass;
   double radius;
   int sectors;
   int stacks;
@@ -41,6 +41,7 @@ typedef struct {
 
 typedef enum {
   SPHERE_INIT_MISSING_DATA,
+  SPHERE_INIT_DATA_ERROR,
   SPHERE_INIT_SUCCESS,
 } SphereInitStatus;
 

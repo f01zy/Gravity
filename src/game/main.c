@@ -1,11 +1,14 @@
 #include <cglm/cglm.h>
 #include <stdbool.h>
+#include <stddef.h>
 #include <stdint.h>
 #include <stdio.h>
+#include <stdlib.h>
 
 #include "core/defines.h"
 #include "core/graphics.h"
 #include "core/time.h"
+#include "core/utility.h"
 #include "game/window.h"
 #include "grid/grid.h"
 #include "physics/physics.h"
@@ -15,7 +18,13 @@
 #include "renderer/renderer.h"
 #include "resources/resource_manager.h"
 
-int main() {
+int main(int argc, char **argv) {
+  size_t arguments = argc - 1;
+  if (!arguments || arguments % 8) {
+    utility_help_message();
+    return 0;
+  }
+
   ResourceManager resource_manager = {0};
   Time time = {.fps = FPS};
   Camera camera;
@@ -50,29 +59,31 @@ int main() {
 
   vec3 grid_position = {0.0f, -5.0f, 0.0f};
   vec2 grid_size = {100.0f, 100.0f};
-  ivec2 grid_resolution = {100, 100};
+  ivec2 grid_resolution = {200, 200};
   grid_initialize(&grid, &resource_manager, grid_position, grid_size, grid_resolution);
   camera_initialize(&camera);
 
-  res_create_sphere(&resource_manager, "../resources/textures/earth.jpg",
-                    (SphereProperties){
-                      .position = {0.0f, 0.0f, 0.0f},
-                      .velocity = {0.0f, 0.0f, 0.0f},
-                      .weight = 5.972e24f,
-                      .radius = 6371000.0f,
-                      .sectors = 72,
-                      .stacks = 24,
-                    });
-
-  res_create_sphere(&resource_manager, "../resources/textures/mercury.jpg",
-                    (SphereProperties){
-                      .position = {0.0f, 0.0f, 384400000.0f},
-                      .velocity = {1018.289f, 0.0f, 0.0f},
-                      .weight = 7.35e22f,
-                      .radius = 1737500.0f,
-                      .sectors = 72,
-                      .stacks = 24,
-                    });
+  size_t spheres = arguments / 8;
+  for (int i = 0; i < spheres; i++) {
+    double res[8];
+    for (int j = 0; j < 8; j++) {
+      char *status;
+      res[j] = strtod(argv[i * 8 + j + 1], &status);
+      if (*status != '\0') {
+        utility_help_message();
+        return 1;
+      }
+    }
+    res_create_sphere(&resource_manager, NULL,
+                      (SphereProperties){
+                        .position = {res[0], res[1], res[2]},
+                        .velocity = {res[3], res[4], res[5]},
+                        .mass = res[6],
+                        .radius = res[7],
+                        .sectors = 72,
+                        .stacks = 24,
+                      });
+  }
 
   while (!glfwWindowShouldClose(window)) {
     if (!time_check_fps(&time)) continue;
@@ -94,6 +105,7 @@ int main() {
     glfwSwapBuffers(window);
   }
 
+  grid_remove(&grid);
   res_remove_all(&resource_manager);
   glfwTerminate();
 }

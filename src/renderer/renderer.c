@@ -1,5 +1,7 @@
+#include <stdbool.h>
 #include <stdint.h>
 
+#include "core/defines.h"
 #include "core/graphics.h"
 #include "grid/grid.h"
 #include "renderer/context.h"
@@ -49,8 +51,15 @@ void renderer_render_sphere(const ResourceManager *resource_manager, uint32_t sp
   glm_scale_uni(model, scaled_radius);
   uniform_set_mat4(shader_pipeline->shader_program, "model", model);
 
-  glActiveTexture(GL_TEXTURE0);
-  glBindTexture(GL_TEXTURE_2D, texture);
+  if (sphere->texture_id == INVALID_RESOURCE) {
+    uniform_set_int(shader_pipeline->shader_program, "is_texture", false);
+  } else {
+    uniform_set_int(shader_pipeline->shader_program, "is_texture", true);
+    uniform_set_int(shader_pipeline->shader_program, "sphere_texture", 0);
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, texture);
+  }
+
   glBindVertexArray(mesh->VAO);
   glDrawElements(GL_TRIANGLES, indices_count, GL_UNSIGNED_INT, NULL);
   glBindVertexArray(0);
@@ -62,7 +71,7 @@ void renderer_render_scene(const Context *ctx, uint32_t base_shader_pipeline_id,
   mat4 projection;
   camera_update_position(ctx->camera);
   camera_get_view_matrix(ctx->camera, view);
-  glm_perspective(ctx->camera->fov, ctx->window_size[0] / ctx->window_size[1], 0.1f, 100.0f, projection);
+  glm_perspective(ctx->camera->fov, ctx->window_size[0] / ctx->window_size[1], 0.1f, 1000.0f, projection);
 
   const ShaderPipeline *base_shader_pipeline = res_get_shader_pipeline(ctx->resource_manager, base_shader_pipeline_id);
   glUseProgram(base_shader_pipeline->shader_program);

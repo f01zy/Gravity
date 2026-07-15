@@ -2,8 +2,16 @@
 
 in vec3 vertex_normale;
 in vec2 vertex_texture_coordinates;
+
+uniform bool is_texture;
 uniform sampler2D sphere_texture;
 
 out vec4 color;
 
-void main() { color = texture(sphere_texture, vertex_texture_coordinates); }
+void main() {
+  if (is_texture) {
+    color = texture(sphere_texture, vertex_texture_coordinates);
+  } else {
+    color = vec4(1.0f);
+  }
+}

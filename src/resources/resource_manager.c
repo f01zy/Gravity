@@ -141,6 +141,8 @@ uint32_t res_create_sphere(ResourceManager *resource_manager, const char *textur
     case SPHERE_INIT_MISSING_DATA:
       err = "The sphere data is missing";
       break;
+    case SPHERE_INIT_DATA_ERROR:
+      err = "The sphere data is invalid";
     default:
       err = "Failed to initialize the sphere";
       break;
@@ -155,6 +157,8 @@ uint32_t res_create_sphere(ResourceManager *resource_manager, const char *textur
       return INVALID_RESOURCE;
     }
     sphere->texture_id = texture_id;
+  } else {
+    sphere->texture_id = INVALID_RESOURCE;
   }
   Attribute attributes[] = {
     (Attribute){
