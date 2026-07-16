@@ -7,7 +7,7 @@ To get started, clone this repository with all the submodules:
 git clone --recurse-submodules https://github.com/f01zy/Gravity gravity && cd gravity
 ```
 
-If you have NixOS then run the nix-shell to load wayland and OpenGL dependencies (currently, only Wayland build is supported):
+If you have NixOS then run the nix-shell to load wayland, X11 and OpenGL dependencies:
 
 ```bash
 nix-shell
@@ -25,7 +25,7 @@ cmake --build .
 To launch the simulation with a custom body, pass the initial parameters as command-line arguments:
 
 ```bash
-./gravity <x y z> <vx vy vz> <mass> <radius>
+./gravity <x y z> <vx vy vz> <mass> <radius> ...
 ```
 
 - `x`, `y`, `z` - Initial position coordinates (float).
@@ -41,6 +41,3 @@ For example, a scene with Earth and the Moon:
 
 ## Preview
 ![preview](resources/preview.jpg)
-
-## Architecture
-![architecture](resources/architecture.png)

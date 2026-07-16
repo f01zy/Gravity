@@ -1,9 +1,10 @@
 #include <stdbool.h>
 #include <stdio.h>
 
+#include "context/context.h"
+#include "core/defines.h"
 #include "core/graphics.h"
 #include "game/input.h"
-#include "renderer/context.h"
 #include "window.h"
 
 GLFWwindow *window_create(Context *ctx) {
@@ -16,7 +17,7 @@ GLFWwindow *window_create(Context *ctx) {
   glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
   glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
   glfwWindowHint(GLFW_RESIZABLE, GL_FALSE);
-  GLFWwindow *window = glfwCreateWindow(ctx->window_size[0], ctx->window_size[1], ctx->window_title, NULL, NULL);
+  GLFWwindow *window = glfwCreateWindow(WIDTH, HEIGHT, TITLE, NULL, NULL);
   if (!window) {
     printf("[ERROR] Failed to create window\n");
     glfwTerminate();
@@ -25,8 +26,8 @@ GLFWwindow *window_create(Context *ctx) {
 
   glfwMakeContextCurrent(window);
   glfwSetWindowUserPointer(window, ctx);
-  glfwSetScrollCallback(window, mouse_scroll_callback);
-  glfwSetCursorPosCallback(window, mouse_position_callback);
+  glfwSetScrollCallback(window, input_mouse_scroll_callback);
+  glfwSetCursorPosCallback(window, input_mouse_position_callback);
 
   int version = gladLoadGL(glfwGetProcAddress);
   if (version == 0) {

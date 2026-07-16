@@ -7,6 +7,18 @@ let
     wayland-protocols
     libxkbcommon
     libdecor
+
+    libxcb
+    libXtst
+    libX11
+    libXext
+    libXcursor
+    libXrandr
+    libXi
+    libXfixes
+    libXScrnSaver
+    libxinerama
+
     libffi
     libglvnd
     libGL

@@ -1,8 +1,9 @@
 #include <stdio.h>
 #include <string.h>
 
+#include "context/context.h"
+#include "core/defines.h"
 #include "core/graphics.h"
-#include "renderer/context.h"
 #include "renderer/text.h"
 #include "resources/font.h"
 #include "resources/resource_manager.h"
@@ -23,7 +24,7 @@ void render_text(const Context *ctx, TextResources resources, TextProperties pro
   glBindVertexArray(mesh->VAO);
 
   mat4 projection;
-  glm_ortho(0.0f, ctx->window_size[0], 0.0f, ctx->window_size[1], 0.0f, 100.0f, projection);
+  glm_ortho(0.0f, WIDTH, 0.0f, HEIGHT, 0.0f, 100.0f, projection);
   uniform_set_mat4(shader_pipeline->shader_program, "projection", projection);
   uniform_set_vec3(shader_pipeline->shader_program, "text_color", properties.color);
 

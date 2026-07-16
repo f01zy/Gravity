@@ -1,10 +1,10 @@
 #include <stdbool.h>
 #include <stdint.h>
 
+#include "context/context.h"
 #include "core/defines.h"
 #include "core/graphics.h"
 #include "grid/grid.h"
-#include "renderer/context.h"
 #include "renderer/renderer.h"
 #include "resources/resource_manager.h"
 #include "resources/shader.h"
@@ -71,7 +71,7 @@ void renderer_render_scene(const Context *ctx, uint32_t base_shader_pipeline_id,
   mat4 projection;
   camera_update_position(ctx->camera);
   camera_get_view_matrix(ctx->camera, view);
-  glm_perspective(ctx->camera->fov, ctx->window_size[0] / ctx->window_size[1], 0.1f, 1000.0f, projection);
+  glm_perspective(ctx->camera->fov, (float)WIDTH / (float)HEIGHT, 0.1f, 1000.0f, projection);
 
   const ShaderPipeline *base_shader_pipeline = res_get_shader_pipeline(ctx->resource_manager, base_shader_pipeline_id);
   glUseProgram(base_shader_pipeline->shader_program);

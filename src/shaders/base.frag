@@ -12,6 +12,6 @@ void main() {
   if (is_texture) {
     color = texture(sphere_texture, vertex_texture_coordinates);
   } else {
-    color = vec4(1.0f);
+    color = vec4(1.0f, 0.984f, 0.0f, 1.0f);
   }
 }

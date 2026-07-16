@@ -4,7 +4,7 @@
 #include <cglm/cglm.h>
 #include <stdint.h>
 
-#include "renderer/context.h"
+#include "context/context.h"
 
 typedef struct {
   const char *text;

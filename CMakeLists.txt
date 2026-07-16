@@ -4,16 +4,16 @@ project(glavity_simulation C)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/$<CONFIGURATION>")
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/$<CONFIGURATION>")
-set(GLFW_BUILD_WAYLAND ON)
-set(GLFW_BUILD_X11 OFF)
 set(OpenGL_GL_PREFERENCE GLVND)
 set(TARGET gravity)
 set(SOURCE
   ./src/game/main.c
   ./src/game/window.c
   ./src/game/input.c
+  ./src/game/game.c
   ./src/core/time.c
   ./src/core/utility.c
+  ./src/context/context.c
   ./src/physics/physics.c
   ./src/grid/grid.c
   ./src/renderer/camera.c

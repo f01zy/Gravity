@@ -39,8 +39,8 @@ size_t utility_get_opengl_type_size(GLenum type) {
 void utility_help_message() {
   printf("Usage: ./gravity <x> <y> <z> <vx> <vy> <vz> <mass> <radius>\n");
   printf("Arguments:\n");
-  printf("  x, y, z      Initial position coordinates (float)\n");
-  printf("  vx, vy, vz   Initial velocity vector (float)\n");
-  printf("  mass         Object mass (double, > 0)\n");
-  printf("  radius       Physical radius of the body (double, > 0)\n");
+  printf(" - x, y, z      Initial position coordinates (float).\n");
+  printf(" - vx, vy, vz   Initial velocity vector (float).\n");
+  printf(" - mass         Object mass (double, > 0).\n");
+  printf(" - radius       Physical radius of the body (double, > 0).\n");
 }

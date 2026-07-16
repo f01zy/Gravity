@@ -5,10 +5,11 @@
 
 typedef struct {
   float lastframe;
+  float lastpress;
   float deltatime;
-  float fps;
 } Time;
 
 bool time_check_fps(Time *time);
+bool time_check_press(Time *time);
 
 #endif
